@@ -17,7 +17,7 @@ export default function App() {
 
     <NavigationContainer>
       <SafeAreaView style={styles.container}>
-        <Stack.Navigator initialRouteName='Tab2'>
+        <Stack.Navigator initialRouteName='SplashScreen'>
           <Stack.Screen
             name="SplashScreen"
             component={SplashScreen}
@@ -33,7 +33,7 @@ export default function App() {
             }}
           />
           <Stack.Screen
-            name="Tab2"
+            name="Tab"
             component={Tab}
             options={{
               headerShown: false,

@@ -1,26 +1,24 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
 import MapView from 'react-native-maps';
-import TabsNavigator from './TabsNavigator';
-
+import MapScreenFooter from '../components/MapScreenFooter';
 
 const MapScreen = () => {
   return (
     <View style={styles.container}>
       <MapView style={styles.map} />
+      <MapScreenFooter />
     </View>
-  )
-}
+  );
+};
 
-
-export default MapScreen
+export default MapScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
   map: {
-    width: '100%',
-    height: '100%',
+    flex: 1,
   },
 });
