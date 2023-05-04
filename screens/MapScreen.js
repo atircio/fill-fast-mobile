@@ -3,7 +3,7 @@ import { Dimensions, StyleSheet, View } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import MapScreenFooter from '../components/MapScreenFooter';
 import {
-   requestForegroundPermissionsAsync, getCurrentPositionAsync, LocationObject } from 'expo-location';
+   requestForegroundPermissionsAsync, getCurrentPositionAsync, LocationObject, watchPositionAsync, LocationAccuracy } from 'expo-location';
 
 const { width, height } = Dimensions.get('window');
 
@@ -31,6 +31,17 @@ const MapScreen = () => {
   useEffect(() => {
     requestLcationPermission();
   }, []);
+
+  useEffect(() => {
+    watchPositionAsync({
+      accuracy: LocationAccuracy.Highest,
+      timeInterval: 1000,
+      distanceInterval: 1
+    }, (response) => {
+      console.log("NOVA LOCALIZAÇÃO =>", response);
+      setLocation(response);
+    });
+  },[]);
 
 
   return (
