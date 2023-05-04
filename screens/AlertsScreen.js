@@ -11,4 +11,6 @@ const AlertsScreen = () => {
 
 export default AlertsScreen
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  
+})
