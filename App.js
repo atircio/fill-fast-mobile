@@ -8,6 +8,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import MapView from 'react-native-maps';
 import SplashScreen from './screens/SplashScreen';
 import Tab from './screens/Tab';
+import PaScreen from './screens/PaScreen';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -28,6 +29,13 @@ export default function App() {
           <Stack.Screen
             name="MapScreen"
             component={MapScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="PaScreen"
+            component={PaScreen}
             options={{
               headerShown: false,
             }}
