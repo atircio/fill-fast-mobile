@@ -18,7 +18,7 @@ const SplashScreen = () => {
 
   useEffect(() =>{
     if(authoLoaded){
-      navigation.replace('Tab')
+      navigation.replace('WelcomeScreen')
     }
   }, [authoLoaded])
 

@@ -4,7 +4,7 @@ import { AntDesign, Ionicons, FontAwesome5, Feather } from '@expo/vector-icons';
 import { COLORS } from '../src/theme/theme';
 
 const PaScreen = ({ route }) => {
-  //const { id, name, rating, reviews, imageReference, address } = route.params;
+  const { id, name, rating, reviews, imageReference, address } = route.params;
   const API_KEY = 'AIzaSyA1elJaTMHC0I1_IyFlt4x31_lu-AoB_Vc';
   const [imageError, setImageError] = useState(false);
   const handleImageError = () => {
@@ -48,11 +48,11 @@ const PaScreen = ({ route }) => {
         <View style={styles.details}>
           <View style={styles.paRow}>
             <View style={{ justifyContent: 'space-around', flex: 1, }}>
-              <Text style={[styles.paLabel, { width: '100%' }]} numberOfLines={1} ellipsizeMode='tail'>Posto da Sonangol</Text>
+              <Text style={[styles.paLabel, { width: '100%' }]} numberOfLines={1} ellipsizeMode='tail'>{name}</Text>
               <View style={styles.paRow}>
                 <AntDesign name="staro" style={styles.paStars} />
-                <Text style={{ color: COLORS.gold, marginLeft: 2, }}>4.5</Text>
-                <Text style={{ color: COLORS.dark, marginLeft: 8 }}>355</Text>
+                <Text style={{ color: COLORS.gold, marginLeft: 2, }}>{rating}</Text>
+                <Text style={{ color: COLORS.dark, marginLeft: 8 }}>{reviews}</Text>
               </View>
             </View>
             <TouchableOpacity style={styles.favPa}>
@@ -62,7 +62,7 @@ const PaScreen = ({ route }) => {
           <View style={[styles.paColumn, { marginTop: 20 }]}>
             <View>
               <Text style={{ color: COLORS.grey, fontSize: 14 }}>Endereço</Text>
-              <Text style={[{ marginTop: 6 }]}>Estrada Viana/Zango 1, Luanda</Text>
+              <Text style={[{ marginTop: 6 }]}>{address}</Text>
             </View>
             <TouchableOpacity style={styles.routeItemContainer}>
               <FontAwesome5 name="route" size={20} color="black" />

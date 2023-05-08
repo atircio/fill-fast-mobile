@@ -9,6 +9,7 @@ import MapView from 'react-native-maps';
 import SplashScreen from './screens/SplashScreen';
 import Tab from './screens/Tab';
 import PaScreen from './screens/PaScreen';
+import WelcomeScreen from './screens/WelcomeScreen';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -18,7 +19,7 @@ export default function App() {
 
     <NavigationContainer>
       <SafeAreaView style={styles.container}>
-        <Stack.Navigator initialRouteName='PaScreen'>
+        <Stack.Navigator initialRouteName='SplashScreen'>
           <Stack.Screen
             name="SplashScreen"
             component={SplashScreen}
@@ -41,6 +42,13 @@ export default function App() {
             }}
           />
           <Stack.Screen
+            name="WelcomeScreen"
+            component={WelcomeScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
             name="Tab"
             component={Tab}
             options={{
@@ -48,7 +56,6 @@ export default function App() {
             }}
           />
           
-
         </Stack.Navigator>
       </SafeAreaView>
     </NavigationContainer>
