@@ -188,9 +188,6 @@ const MapScreenFooter = () => {
         renderItem={renderStation}
         contentContainerStyle={styles.stationsList}
       />
-
-
-
     </View>
   );
 };
