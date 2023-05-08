@@ -4,10 +4,20 @@ import { AntDesign, Ionicons } from '@expo/vector-icons';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { COLORS } from '../src/theme/theme';
 import { LocationAccuracy, getCurrentPositionAsync, requestForegroundPermissionsAsync, watchPositionAsync } from 'expo-location';
+import MapViewDirections from 'react-native-maps-directions';
+
+const API_KEY = 'AIzaSyA1elJaTMHC0I1_IyFlt4x31_lu-AoB_Vc';
+
 
 const MapScreenFooter = () => {
   const [location, setLocation] = useState(null);
   const [stations, setStations] = useState([]);
+  const [imageError, setImageError] = useState(false);
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
 
   useEffect(() => {
     const getPermission = async () => {
@@ -30,18 +40,17 @@ const MapScreenFooter = () => {
   useEffect(() => {
     watchPositionAsync({
       accuracy: LocationAccuracy.Highest,
-      timeInterval: 1,
+      timeInterval: 10,
       distanceInterval: 10
     }, (response) => {
       console.log("NOVA LOCALIZAÇÃO dos postos =>", response);
       setLocation(response);
     });
-  }, [location]);
+  }, []);
 
 
   useEffect(() => {
-    const API_KEY = 'AIzaSyA1elJaTMHC0I1_IyFlt4x31_lu-AoB_Vc';
-    const radius = 5000; // 5km em metros
+    const radius = 50000; // 5km em metros
 
 
 
@@ -56,8 +65,14 @@ const MapScreenFooter = () => {
             name: result.name,
             rating: result.rating,
             reviews: result.user_ratings_total,
-            distance: `${Math.round(result.distance / 100) / 10}km`,
+            distance: result.distance? `${Math.round(result.distance / 100) / 10}km,` : `${0}km,`,
+            latitude: result.geometry.location.lat,
+            longitude: result.geometry.location.lng,
+            /*imageReference: result.photos[0].photo_reference ? 
+            imageReference: result.photos[0].photo_reference */
+
           }));
+          console.log(stations)
           setStations(stations);
         })
         .catch(error => {
@@ -66,28 +81,61 @@ const MapScreenFooter = () => {
     }
   }, [location]);
 
-  const renderStation = ({ item }) => (
-    <View style={styles.paContainer}>
-      <Image
-        style={styles.paImage}
-        source={{
-          uri: item.imageUri,
-        }}
-      />
-      <Text style={[styles.paLabel, { width: '100%' }]} numberOfLines={1} ellipsizeMode='tail'>{item.name}</Text>
-      <View style={styles.paRow}>
-        <AntDesign name="staro" style={styles.paStars} />
-        <Text style={{ color: COLORS.gold, marginLeft: 2 }}>{item.rating}</Text>
-        <Text style={{ color: COLORS.dark, marginLeft: 8 }}>({item.reviews})</Text>
+  const renderStation = ({ item }) => {
+    const destination = {
+      latitude: item.latitude,
+      longitude: item.longitude,
+    };
+    return (
+      <View style={styles.paContainer}>
+        <Image
+          style={styles.paImage}
+          source={
+            !imageError
+              ? { uri: 'https://lh5.googleusercontent.com/p/AF1QipPRFkTQXX2rdaKNwAaaSzo02hgP0-Kcf3VIZE_t=w408-h306-k-no' }
+              : require('../assets/imgDefaultGas.jpg')
+          }
+          onError={handleImageError}
+        />
+        <Text style={[styles.paLabel, { width: '100%' }]} numberOfLines={1} ellipsizeMode='tail'>{item.name}</Text>
+        <View style={styles.paRow}>
+          <AntDesign name="staro" style={styles.paStars} />
+          <Text style={{ color: COLORS.gold, marginLeft: 2 }}>{item.rating}</Text>
+          <Text style={{ color: COLORS.dark, marginLeft: 8 }}>({item.reviews})</Text>
+        </View>
+        <View style={styles.paRow}>
+          <Ionicons name="ios-location-outline" style={styles.paLocation} />
+          <Text style={{ color: COLORS.grey, marginLeft: 2 }}>{item.distance}</Text>
+          <AntDesign name="clockcircleo" size={18} style={{ marginLeft: 8, color: COLORS.grey }} />
+          <Text style={{ color: COLORS.grey, marginLeft: 5 }}>{item.time}</Text>
+        </View>
+        <MapViewDirections
+          origin={location.coords ? location.coords : {latitude: 13.2413602 ,
+            longitude: -8.9444613}}
+          destination={{latitude: -8.8260679,
+            longitude: 13.2449049}}
+          apikey={API_KEY}
+          strokeWidth={3}
+          strokeColor={COLORS.primary}
+          onReady={result => {
+            const distance = `${Math.round(result.distance / 100) / 10}km`;
+            const time = `${Math.round(result.duration / 60)} min`;
+            const updatedStations = stations.map(station => {
+              if (station.id === item.id) {
+                return {
+                  ...station,
+                  distance,
+                  time,
+                };
+              }
+              return station;
+            });
+            setStations(updatedStations);
+          }}
+        />
       </View>
-      <View style={styles.paRow}>
-        <Ionicons name="ios-location-outline" style={styles.paLocation} />
-        <Text style={{ color: COLORS.grey, marginLeft: 2 }}>{item.distance}</Text>
-        <AntDesign name="clockcircleo" size={18} style={{ marginLeft: 8, color: COLORS.grey }} />
-        <Text style={{ color: COLORS.grey, marginLeft: 5 }}>{item.time}</Text>
-      </View>
-    </View>
-  );
+    )
+  };
 
 
 
