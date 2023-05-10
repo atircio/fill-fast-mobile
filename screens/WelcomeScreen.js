@@ -9,6 +9,9 @@ const WelcomeScreen = () => {
   const Press = () => {
     navigation.replace('Tab')
   }
+  const goToSignIn = () => {
+    navigation.replace('SignInScreen')
+  }
   return (
     <View style={{
       backgroundColor: COLORS.bg, height: '100%'
@@ -25,9 +28,13 @@ const WelcomeScreen = () => {
         <Text style={styles.mainText}>
           Encontre o posto {'\n'}mais proximo
         </Text>
-        <TouchableOpacity style={{marginTop: 15,backgroundColor: COLORS.brown, padding:15, borderRadius: 30, paddingHorizontal: 40}} onPress={Press}>
-          <Text style={{color: COLORS.white, fontWeight: 'bold'}}>Obter Direção</Text>
+        <TouchableOpacity style={{ marginTop: 15, backgroundColor: COLORS.brown, padding: 15, borderRadius: 30, paddingHorizontal: 40 }} onPress={Press}>
+          <Text style={{ color: COLORS.white, fontWeight: 'bold' }}>Obter Direção</Text>
         </TouchableOpacity>
+        <TouchableOpacity>
+          <Text style={{color: COLORS.grey,marginTop: 8, textDecorationLine: 'underline'}} onPress={goToSignIn}>Ou faça login</Text>
+        </TouchableOpacity>
+
       </View>
 
     </View>
@@ -43,7 +50,7 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     borderBottomLeftRadius: 100,
     borderBottomRightRadius: 100,
-    
+
 
   },
   text: {
