@@ -1,22 +1,26 @@
 {
   "name": "fill-fast",
   "version": "1.0.0",
-  "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "start": "expo start --dev-client",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^1.18.1",
     "@react-native-community/geolocation": "^3.0.6",
     "@react-navigation/bottom-tabs": "^6.5.7",
     "@react-navigation/native": "^6.1.6",
     "@react-navigation/native-stack": "^6.9.12",
-    "expo": "^46.0.21",
+    "expo": "~46.0.21",
+    "expo-auth-session": "~3.7.4",
+    "expo-crypto": "~11.0.0",
     "expo-linear-gradient": "~11.4.0",
     "expo-location": "~14.3.0",
+    "expo-random": "~12.3.0",
     "expo-status-bar": "~1.4.4",
+    "expo-web-browser": "~11.0.0",
     "lottie-react-native": "5.1.3",
     "react": "18.0.0",
     "react-dom": "18.0.0",
@@ -26,7 +30,8 @@
     "react-native-safe-area-context": "4.3.1",
     "react-native-screens": "~3.15.0",
     "react-native-vector-icons": "^9.2.0",
-    "react-native-web": "~0.18.11"
+    "react-native-web": "~0.18.11",
+    "expo-splash-screen": "~0.16.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
