@@ -10,7 +10,7 @@ const WelcomeScreen = () => {
     navigation.replace('Tab')
   }
   const goToSignIn = () => {
-    navigation.replace('SignInScreen')
+    navigation.navigate('SignInScreen')
   }
   return (
     <View style={{

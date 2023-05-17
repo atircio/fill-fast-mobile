@@ -11,6 +11,7 @@ import Tab from './screens/Tab';
 import PaScreen from './screens/PaScreen';
 import WelcomeScreen from './screens/WelcomeScreen';
 import SignInScreen from './screens/SignInScreen';
+import TravelScreen from './screens/TravelScreen';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -20,7 +21,7 @@ export default function App() {
 
     <NavigationContainer>
       <SafeAreaView style={styles.container}>
-        <Stack.Navigator initialRouteName='SignInScreen'>
+        <Stack.Navigator initialRouteName='SplashScreen'>
           <Stack.Screen
             name="SplashScreen"
             component={SplashScreen}
@@ -45,6 +46,13 @@ export default function App() {
           <Stack.Screen
             name="SignInScreen"
             component={SignInScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="TravelScreen"
+            component={TravelScreen}
             options={{
               headerShown: false,
             }}

@@ -1,22 +1,39 @@
 import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { COLORS } from '../src/theme/theme';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import { useNavigation } from '@react-navigation/native';
 import * as AuthSession from 'expo-auth-session'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+WebBrowser.maybeCompleteAuthSession();
+
 
 /*type AuthResponse = {
   params: {
     access_token: string
   }
+  web 223371228008-i1smj6f8vv10utk30q61rt1d5ssdolif.apps.googleusercontent.com
+  android 223371228008-vai4jchriiukad29c9bbcejas9lo5uhq.apps.googleusercontent.com
 }*/
 
 
 const SignInScreen = () => {
   const navigation = useNavigation();
 
-  async function handleGoogleSignIn(){
+  const [token, setToken] = useState("");
+
+  /*const [userInfo, setUserInfo] = useState(null);
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    androidClientId: "223371228008-vai4jchriiukad29c9bbcejas9lo5uhq.apps.googleusercontent.com",
+    expoClientId: "223371228008-vj6e983ja8q7rhn2v9lvqoglsrsv1aau.apps.googleusercontent.com",
+
+    //iosClientId: "GOOGLE_GUID.apps.googleusercontent.com",
+
+  });
+
+ /* async function handleGoogleSignIn(){
     try {
       const CLIENT_ID = "223371228008-i1smj6f8vv10utk30q61rt1d5ssdolif.apps.googleusercontent.com";
       const REDIRECT_URI = "https://auth.expo.io/@atircio/fill-fast";
@@ -32,12 +49,35 @@ const SignInScreen = () => {
     } catch (error) {
       
     }
-  }
-  
+  }*/
+
 
   const Press = () => {
-    handleGoogleSignIn();
+    //promptAsync;
   }
+
+  /* useEffect(() => {
+     if (response?.type === "success") {
+       setToken(response.authentication.accessToken);
+       getUserInfo();
+     }
+   }, [response, token]);
+ 
+   const getUserInfo = async () => {
+     try {
+       const response = await fetch(
+         "https://www.googleapis.com/userinfo/v2/me",
+         {
+           headers: { Authorization: `Bearer ${token}` },
+         }
+       );
+ 
+       const user = await response.json();
+       setUserInfo(user);
+     } catch (error) {
+       // Add your own error handler here
+     }
+   };*/
 
   /*async function handleGoogleSignIn(){
     try {
@@ -56,6 +96,25 @@ const SignInScreen = () => {
     }
   }
 */
+
+  //********************* */
+
+
+  async function signInWithGoogleAsync() {
+    try {
+      const result = await Google.logInAsync({
+        androidClientId: "223371228008-vai4jchriiukad29c9bbcejas9lo5uhq.apps.googleusercontent.com",
+        expoClientId: "223371228008-vj6e983ja8q7rhn2v9lvqoglsrsv1aau.apps.googleusercontent.com",
+        iosClientId: "223371228008-rhl7cpl0v3j877754u0g7tli6r02fjvm.apps.googleusercontent.com",
+        scopes
+
+      })
+
+    } catch (error) {
+
+    }
+  }
+
   return (
     <View style={{ backgroundColor: COLORS.bg, height: '100%' }}>
       <View style={{ alignItems: 'center', marginTop: 40 }}>
@@ -82,7 +141,9 @@ const SignInScreen = () => {
         </TouchableOpacity>
         <View style={styles.separator} />
         <TouchableOpacity>
-          <Text style={styles.continueWithGoogle} onPress={Press}>Continuar com Google</Text>
+          <Text style={styles.continueWithGoogle} onPress={() => {
+            promptAsync();
+          }} >Continuar com Google</Text>
         </TouchableOpacity>
       </View>
     </View>

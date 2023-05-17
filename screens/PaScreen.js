@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList } from 'react-native';
 import { AntDesign, Ionicons, FontAwesome5, Feather } from '@expo/vector-icons';
 import { COLORS } from '../src/theme/theme';
+import { useNavigation } from '@react-navigation/native';
 
 const PaScreen = ({ route }) => {
-  const { id, name, rating, reviews, imageReference, address } = route.params;
+  const { id, name, rating, reviews, imageReference, address, latitude2, longitude2 } = route.params;
   const API_KEY = 'AIzaSyA1elJaTMHC0I1_IyFlt4x31_lu-AoB_Vc';
   const [imageError, setImageError] = useState(false);
   const handleImageError = () => {
@@ -25,6 +26,24 @@ const PaScreen = ({ route }) => {
   ]
 
 
+  const navigation = useNavigation();
+ 
+
+  const pressToTravel = () => {
+    navigation.navigate('PaScreen', 
+    {
+      latitude: item.latitude,
+      longitude: item.longitude,
+    })
+  }
+
+  const Press = () => {
+    navigation.navigate('TravelScreen', 
+    {
+      lat: latitude2,
+      lon: longitude2,
+    })
+  }
 
 
 
@@ -64,7 +83,7 @@ const PaScreen = ({ route }) => {
               <Text style={{ color: COLORS.grey, fontSize: 14 }}>Endereço</Text>
               <Text style={[{ marginTop: 6 }]}>{address}</Text>
             </View>
-            <TouchableOpacity style={styles.routeItemContainer}>
+            <TouchableOpacity style={styles.routeItemContainer} onPress={Press}>
               <FontAwesome5 name="route" size={20} color="black" />
             </TouchableOpacity>
           </View>

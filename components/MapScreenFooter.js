@@ -99,15 +99,17 @@ const MapScreenFooter = () => {
     };
 
     const Press = () => {
-      navigation.navigate('PaScreen', 
-      {
-        id: item.id,
-        name: item.name,
-        rating: item.rating,
-        reviews: item.reviews,
-        imageReference: item.imageReference,
-        address: item.address
-      })
+      navigation.navigate('PaScreen',
+        {
+          id: item.id,
+          name: item.name,
+          rating: item.rating,
+          reviews: item.reviews,
+          imageReference: item.imageReference,
+          address: item.address,
+          latitude2: item.latitude,
+          longitude2: item.longitude,
+        })
     }
 
     return (
