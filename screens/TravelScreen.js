@@ -1,15 +1,18 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, StyleSheet, Button } from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
-import { requestForegroundPermissionsAsync, getCurrentPositionAsync } from 'expo-location';
+import { requestForegroundPermissionsAsync, getCurrentPositionAsync, watchPositionAsync } from 'expo-location';
 import MapViewDirections from 'react-native-maps-directions';
 
 const TravelScreen = ({ route }) => {
-  const { lat, lon} = route.params;
+  const { lat, lon } = route.params;
 
-  const YOUR_GOOGLE_MAPS_API_KEY = 'AIzaSyA1elJaTMHC0I1_IyFlu-t4x31_lAoB_Vc'
+  const YOUR_GOOGLE_MAPS_API_KEY = 'AIzaSyA1elJaTMHC0I1_IyFlt4x31_lu-AoB_Vc';
   const mapRef = useRef(null);
   const [location, setLocation] = useState(null);
+  const [distance, setDistance] = useState('');
+  const [duration, setDuration] = useState('');
+  const [directions, setDirections] = useState(null);
 
   useEffect(() => {
     const getPermission = async () => {
@@ -26,6 +29,75 @@ const TravelScreen = ({ route }) => {
 
     getPermission();
   }, []);
+
+  useEffect(() => {
+    const updateLocation = (newLocation) => {
+      setLocation(newLocation);
+    };
+
+    const watchUserPosition = async () => {
+      const positionWatcher = await watchPositionAsync(
+        {
+          accuracy: 6,
+          timeInterval: 1000,
+          distanceInterval: 10,
+        },
+        (newLocation) => {
+          updateLocation(newLocation);
+        }
+      );
+
+      return () => {
+        if (positionWatcher) {
+          positionWatcher.remove();
+        }
+      };
+    };
+
+    if (location) {
+      watchUserPosition();
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (location) {
+      const origin = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
+      const destination = {
+        latitude: lat,
+        longitude: lon,
+      };
+
+      const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&key=${YOUR_GOOGLE_MAPS_API_KEY}`;
+
+      fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.routes && data.routes.length > 0) {
+            const route = data.routes[0];
+            const leg = route.legs[0];
+            setDistance(leg.distance.text);
+            setDuration(leg.duration.text);
+
+            const directions = (
+              <MapViewDirections
+                origin={origin}
+                destination={destination}
+                apikey={YOUR_GOOGLE_MAPS_API_KEY}
+                strokeWidth={4}
+                strokeColor="hotpink"
+              />
+            );
+            setDirections(directions);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }, [location]);
 
   return (
     <View style={styles.container}>
@@ -49,24 +121,12 @@ const TravelScreen = ({ route }) => {
             title="Minha Localização"
           />
         )}
-        {location && (
-          <MapViewDirections
-            origin={{
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-            }}
-            destination={{
-              latitude: lat,
-              longitude: lon,
-            }}
-            language="pt"
-
-            apikey='AIzaSyA1elJaTMHC0I1_IyFlt4x31_lu-AoB_Vc'
-            strokeWidth={4}
-            strokeColor="hotpink"
-          />
-        )}
+        {directions && directions}
       </MapView>
+      <View style={styles.infoContainer}>
+        <Text style={styles.infoText}>Distância: {distance}</Text>
+        <Text style={styles.infoText}>Tempo Restante: {duration}</Text>
+      </View>
     </View>
   );
 };
@@ -77,6 +137,20 @@ const styles = StyleSheet.create({
   },
   map: {
     flex: 1,
+  },
+  infoContainer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    padding: 10,
+    borderRadius: 10,
+  },
+  infoText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 5,
   },
 });
 

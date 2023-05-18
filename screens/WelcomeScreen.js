@@ -26,7 +26,7 @@ const WelcomeScreen = () => {
       </View>
       <View style={styles.text}>
         <Text style={styles.mainText}>
-          Encontre o posto {'\n'}mais proximo
+          Encontre o posto mais{'\n'} próximo com o FillFast
         </Text>
         <TouchableOpacity style={{ marginTop: 15, backgroundColor: COLORS.brown, padding: 15, borderRadius: 30, paddingHorizontal: 40 }} onPress={Press}>
           <Text style={{ color: COLORS.white, fontWeight: 'bold' }}>Obter Direção</Text>
