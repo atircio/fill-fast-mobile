@@ -22,37 +22,9 @@ const MapScreenFooter = () => {
   };
 
 
-  useEffect(() => {
-    let isMounted = true;
 
-    const startWatchingPosition = async () => {
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
 
-        if (status !== 'granted') {
-          // Tratar a permissão negada aqui, se necessário.
-          return;
-        }
-
-        const location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
-        
-        if (isMounted) {
-          setLocation(location);
-        }
-      } catch (error) {
-        // Tratar erros de obtenção de localização aqui.
-      }
-    };
-
-    startWatchingPosition();
-
-    return () => {
-      isMounted = false;
-      Location.stopLocationUpdatesAsync(/* taskName, se aplicável */);
-    };
-  }, []);
-
- /* useEffect(() => {
+ useEffect(() => {
     watchPositionAsync({
       accuracy: LocationAccuracy.Highest,
       timeInterval: 1000000000000,
@@ -61,7 +33,7 @@ const MapScreenFooter = () => {
       console.log("NOVA LOCALIZAÇÃO dos postos =>", response);
       setLocation(response);
     });
-  }, []);*/
+  }, []);
 
 
   useEffect(() => {
