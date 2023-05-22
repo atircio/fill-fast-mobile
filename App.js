@@ -12,6 +12,7 @@ import PaScreen from './screens/PaScreen';
 import WelcomeScreen from './screens/WelcomeScreen';
 import SignInScreen from './screens/SignInScreen';
 import TravelScreen from './screens/TravelScreen';
+import VehicleBuild from './screens/VehicleBuild';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -46,6 +47,13 @@ export default function App() {
           <Stack.Screen
             name="SignInScreen"
             component={SignInScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="VehicleBuild"
+            component={VehicleBuild}
             options={{
               headerShown: false,
             }}

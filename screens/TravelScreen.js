@@ -3,6 +3,7 @@ import { View, StyleSheet, Text } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import { requestForegroundPermissionsAsync, getCurrentPositionAsync, watchPositionAsync } from 'expo-location';
 import MapViewDirections from 'react-native-maps-directions';
+import { COLORS } from '../src/theme/theme';
 
 const TravelScreen = ({ route }) => {
   const { lat, lon } = route.params;
@@ -143,7 +144,7 @@ const styles = StyleSheet.create({
     bottom: 20,
     left: 20,
     right: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: COLORS.white,
     padding: 10,
     borderRadius: 10,
   },

@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useNavigation } from '@react-navigation/native';
 import Lottie from 'lottie-react-native';
+import { COLORS } from '../src/theme/theme';
 
 
 
@@ -38,7 +39,8 @@ const styles = StyleSheet.create({
   root: {
     flex:1,
     alignItems: 'center',
-    justifyContent : 'center'
+    justifyContent : 'center',
+    backgroundColor: COLORS.white
   }
 
 })
