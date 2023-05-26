@@ -12,17 +12,6 @@ import { COLORS } from '../src/theme/theme';
 const Tab = createBottomTabNavigator();
 
 
-
-const Home = () => {
-  return (
-    <View>
-      <Text>Tab</Text>
-    </View>
-  )
-}
-
-
-
 const TabsNavigator = () => {
   const opacity = React.useRef(new Animated.Value(1)).current;
 

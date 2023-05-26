@@ -5,15 +5,19 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from '../firebase';
 import User from '../modules/mobileUser';
+import { CurrentUser, checkAsyncStorageData, getUser } from '../database/Database';
+import { LoginCredentialData } from '../database/LoginCredential';
 
 const SignInScreen = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+
   const navigation = useNavigation();
 
   const handleSignUp = () => {
-      console.log(email+password)
-      createUserWithEmailAndPassword(auth, email, password)
+    console.log(email + password)
+    createUserWithEmailAndPassword(auth, email, password)
       .then(userCredentials => {
         const user = userCredentials.user;
         console.log('Registered with:', user.email)
@@ -29,27 +33,29 @@ const SignInScreen = () => {
       .catch(error => alert(error.message))
   }
 
-  const handleLogin = () => {
-      signInWithEmailAndPassword(auth,email, password)
-      .then(userCredentials => {
-        const user = userCredentials.user;
-        console.log('Logged in with:', user.email);
-      }).then(() => {
+  
 
-        User.pop();
-        User.push({
-          email
-        })
+  const handleLogin = async () => {
+    console.log("*****************************************")
+    try {
+      const userCredentials = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredentials.user;
+  
+      const userInstance = new CurrentUser();
+      await userInstance.insertUser(user);
+  
+      const retrievedUser = await getUser();
+      LoginCredentialData.push(await retrievedUser)
 
-        navigation.replace('Tab')
-
-      })
-      .catch(error => {
-        console.log(error)
-        return(alert(error.message))
-      } )
+    } catch (error) {
+      console.log(error);
+      alert(error.message);
+    } finally {
+      setLoading(false);
+      navigation.replace('Tab');
+    }
   }
-
+  
   return (
     <View style={{ backgroundColor: COLORS.bg, height: '100%' }}>
       <View style={{ alignItems: 'center', marginTop: 40 }}>
@@ -81,16 +87,14 @@ const SignInScreen = () => {
         <View style={styles.separator} />
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-            <Text style={styles.buttonText}>Login</Text>
+            <Text style={styles.buttonText} >Login</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.registerButton} onPress={handleSignUp}>
             <Text style={styles.buttonRe}>Criar conta</Text>
           </TouchableOpacity>
 
         </View>
-        <TouchableOpacity>
-          <Text style={styles.continueWithGoogle} >Continuar com Google</Text>
-        </TouchableOpacity>
+
       </View>
     </View>
   );

@@ -3,62 +3,74 @@ import React from 'react';
 import { COLORS } from '../src/theme/theme';
 import { AntDesign } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import NotAuthorized from './NotAuthorized';
+import { LoginCredentialData } from '../database/LoginCredential';
 
 const VehicleScreen = () => {
 
-    const navigation = useNavigation();
-  
-    const Press = () => {
-      navigation.replace('Tab')
-    }
-    const goToVehicleBuild = () => {
-      navigation.navigate('VehicleBuild')
-    }
+  const navigation = useNavigation();
+
+  const Press = () => {
+    navigation.replace('Tab')
+  }
+  const goToVehicleBuild = () => {
+    navigation.navigate('VehicleBuild')
+  }
+
+  const userWithEmail = LoginCredentialData.find((item) => item && item.email);
+  const result = userWithEmail || null;
 
   const data = [
     { id: '1', title: 'Veículo 1' },
     { id: '2', title: 'Veículo 2' },
     { id: '3', title: 'Veículo 3' },
-    { id: '324', title: 'Veículo 3' },
 
-    { id: '343', title: 'Veículo 3' },
 
   ];
 
   const renderListItem = ({ item }) => (
-    <View style={styles.item}>
-      <Image
-        source={require('../assets/carDefault.png')}
-        style={styles.itemImage}
-      />
-      <View style={styles.itemDetails}>
-        <Text style={styles.itemTitle}>{item.title}</Text>
-        <Text style={styles.itemDescription}>Ano: 2022</Text>
+    <TouchableOpacity onPress={goToVehicleBuild}>
+      <View style={styles.item}>
+        <Image
+          source={require('../assets/carDefault.png')}
+          style={styles.itemImage}
+        />
+        <View style={styles.itemDetails}>
+          <Text style={styles.itemTitle}>{item.title}</Text>
+          <Text style={styles.itemDescription}>Ano: 2022</Text>
+        </View>
+        <TouchableOpacity style={styles.itemButton} onPress={goToVehicleBuild}>
+          <AntDesign name="arrowright" size={16} color="white" />
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.itemButton} onPress={goToVehicleBuild}>
-        <AntDesign name="arrowright" size={16} color="white" />
-      </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
+
   );
 
-  return (
-    <View style={{ backgroundColor: COLORS.bg, height: '100%' }}>
-      <View style={styles.container}>
-        <View style={{ alignItems: 'center', marginTop: 40 }}>
-          <Image source={require('../assets/CarS.gif')} style={{ width: 200, height: 200 }} />
-          <Text style={styles.title}>Configure os seus veículos</Text>
+  if(result){
+    return (
+      <View style={{ backgroundColor: COLORS.bg, height: '100%' }}>
+        <View style={styles.container}>
+          <View style={{ alignItems: 'center', marginTop: 40 }}>
+            <Image source={require('../assets/CarS.gif')} style={{ width: 200, height: 200 }} />
+            <Text style={styles.title}>Configure os seus veículos</Text>
+          </View>
+          <FlatList
+            data={data}
+            renderItem={renderListItem}
+            keyExtractor={(item) => item.id}
+          />
         </View>
-        <FlatList
-          data={data}
-          renderItem={renderListItem}
-          keyExtractor={(item) => item.id}
-        />
+        <TouchableOpacity style={styles.floatingButton} onPress={goToVehicleBuild}>
+          <AntDesign name="plus" size={24} color="white" />
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.floatingButton} onPress={goToVehicleBuild}>
-        <AntDesign name="plus" size={24} color="white" />
-      </TouchableOpacity>
-    </View>
-  );
+    );
+  }else{
+    return(<NotAuthorized/>)
+  }
+
+  
 };
 
 export default VehicleScreen;
@@ -70,7 +82,8 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     textAlign: 'center',
-    marginTop: 20,
+    marginTop: 2,
+    marginBottom: 5,
     fontWeight: 'bold',
   },
   floatingButton: {
@@ -96,8 +109,8 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   itemImage: {
-    width: 80,
-    height: 80,
+    width: 60,
+    height: 60,
     borderRadius: 10,
     resizeMode: 'cover',
   },

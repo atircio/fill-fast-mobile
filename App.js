@@ -1,9 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View , SafeAreaView} from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import MapScreen from './screens/MapScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import MapView from 'react-native-maps';
 import SplashScreen from './screens/SplashScreen';
@@ -13,6 +13,8 @@ import WelcomeScreen from './screens/WelcomeScreen';
 import SignInScreen from './screens/SignInScreen';
 import TravelScreen from './screens/TravelScreen';
 import VehicleBuild from './screens/VehicleBuild';
+import NotAuthorized from './screens/NotAuthorized';
+import { COLORS } from './src/theme/theme';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -22,7 +24,7 @@ export default function App() {
 
     <NavigationContainer>
       <SafeAreaView style={styles.container}>
-        <Stack.Navigator initialRouteName='SplashScreen'>
+        <Stack.Navigator initialRouteName='WelcomeScreen'>
           <Stack.Screen
             name="SplashScreen"
             component={SplashScreen}
@@ -47,6 +49,13 @@ export default function App() {
           <Stack.Screen
             name="SignInScreen"
             component={SignInScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="NotAuthorized"
+            component={NotAuthorized}
             options={{
               headerShown: false,
             }}
@@ -89,7 +98,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.bg,
 textAlign:'center'
   },
   map: {

@@ -1,7 +1,10 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { COLORS } from '../src/theme/theme'
 import { useNavigation } from '@react-navigation/native';
+import { getUser } from '../database/Database';
+import { LoginCredentialData } from '../database/LoginCredential';
+
 
 const WelcomeScreen = () => {
   const navigation = useNavigation();
@@ -12,6 +15,18 @@ const WelcomeScreen = () => {
   const goToSignIn = () => {
     navigation.navigate('SignInScreen')
   }
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const existingUser = await getUser();
+      console.log(existingUser)
+      LoginCredentialData.push(await existingUser)
+    };
+
+    fetchUser();
+  }, []);
+
+
   return (
     <View style={{
       backgroundColor: COLORS.bg, height: '100%'

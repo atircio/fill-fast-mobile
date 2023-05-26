@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput, FlatList } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput, FlatList, Alert } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { COLORS } from '../src/theme/theme';
+import { Picker } from '@react-native-picker/picker';
+import * as ImagePicker from 'expo-image-picker';
+import { useNavigation } from '@react-navigation/native';
+import { db } from '../firebase';
 
 const VehicleBuild = () => {
   const [imageUri, setImageUri] = useState(null);
@@ -12,27 +16,121 @@ const VehicleBuild = () => {
   const [brand, setBrand] = useState('');
   const [model, setModel] = useState('');
   const [year, setYear] = useState('');
+  const [selectedFuelType, setSelectedFuelType] = useState('');
   const [licensePlate, setLicensePlate] = useState('');
 
-  const handleImagePicker = () => {
-    // Lógica para abrir a galeria e selecionar uma imagem
+  const navigation = useNavigation();
+
+  const backScreen = () => {
+    navigation.goBack()
+  }
+
+  const handleImagePicker = async () => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        console.log('Permission denied');
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+
+      if (!result.cancelled) {
+        setImageUri(result.uri);
+      }
+    } catch (error) {
+      console.log('Error selecting image:', error);
+    }
+  };
+  
+  const saveDataToFirestore = () => {
+    // Verificar se todos os campos foram preenchidos
+    if (
+      name === '' ||
+      description === '' ||
+      fuelType === '' ||
+      brand === '' ||
+      model === '' ||
+      year === '' ||
+      licensePlate === ''
+    ) {
+      Alert.alert('Por favor, preencha todos os campos');
+      return;
+    }
+
+    // Obter o ID do usuário atual (supondo que você já tenha implementado a autenticação)
+    const currentUserID = firebase.auth().currentUser.uid;
+
+    // Criar um novo documento no Firestore
+    db.collection('vehicles')
+      .add({
+        userId: currentUserID,
+        name,
+        description,
+        fuelType,
+        hybrid,
+        brand,
+        model,
+        year,
+        licensePlate,
+        imageUri,
+      })
+      .then(() => {
+        Alert.alert('Dados salvos com sucesso!');
+      })
+      .catch((error) => {
+        Alert.alert('Erro ao salvar os dados: ', error);
+      });
   };
 
-  const renderCardItem = ({ item }) => {
+
+  const renderCardItem = () => {
     return (
-      <View style={styles.cardItem}>
-        {item.type === 'input' && (
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder={item.placeholder}
-              onChangeText={item.onChangeText}
-              value={item.value}
-            />
-          </View>
-        )}
-        {item.type === 'text' && <Text style={styles.text}>{item.text}</Text>}
-        {item.type === 'checkbox' && (
+      <>
+        <View style={styles.cardItem}>
+          <TextInput
+            style={styles.input}
+            placeholder="Nome"
+            onChangeText={setName}
+            value={name}
+          />
+        </View>
+        <View style={styles.cardItem}>
+          <TextInput
+            style={styles.input}
+            placeholder="Descrição"
+            onChangeText={setDescription}
+            value={description}
+          />
+        </View>
+        <View style={styles.cardItem}>
+          <Text style={styles.text}>Tipo de Combustíveis</Text>
+          <Picker
+            style={styles.input}
+            selectedValue={selectedFuelType}
+            onValueChange={(itemValue) => setSelectedFuelType(itemValue)}
+          >
+            <Picker.Item label="Gasolina" value="gasolina" />
+            <Picker.Item label="Álcool" value="alcool" />
+            <Picker.Item label="Diesel" value="diesel" />
+          </Picker>
+        </View>
+
+        <View style={styles.cardItem}>
+          <Text style={styles.text}>Tipo de Combustíveis</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Veículo Híbrido (2 tanques)"
+            onChangeText={setFuelType}
+            value={fuelType}
+          />
+        </View>
+        <View style={styles.cardItem}>
           <TouchableOpacity
             style={styles.checkboxButton}
             onPress={() => setHybrid(!hybrid)}
@@ -42,83 +140,43 @@ const VehicleBuild = () => {
             ) : (
               <AntDesign name="checksquareo" size={24} color="black" />
             )}
-            <Text style={styles.checkboxLabel}>{item.label}</Text>
+            <Text style={styles.checkboxLabel}>Veículo Híbrido (2 tanques)</Text>
           </TouchableOpacity>
-        )}
-      </View>
+        </View>
+        <View style={styles.cardItem}>
+          <Text style={styles.text}>Sobre o Carro</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Marca"
+            onChangeText={setBrand}
+            value={brand}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Modelo"
+            onChangeText={setModel}
+            value={model}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Ano"
+            onChangeText={setYear}
+            value={year}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Matrícula"
+            onChangeText={setLicensePlate}
+            value={licensePlate}
+          />
+        </View>
+      </>
     );
   };
 
-  const data = [
-    {
-      id: '1',
-      type: 'input',
-      placeholder: 'Nome',
-      value: name,
-      onChangeText: setName,
-    },
-    {
-      id: '2',
-      type: 'input',
-      placeholder: 'Descrição',
-      value: description,
-      onChangeText: setDescription,
-    },
-    {
-      id: '3',
-      type: 'text',
-      text: 'Tipo de Combustíveis',
-    },
-    {
-      id: '4',
-      type: 'input',
-      placeholder: 'Veículo Híbrido (2 tanques)',
-      value: fuelType,
-      onChangeText: setFuelType,
-    },
-    {
-      id: '5',
-      type: 'checkbox',
-      label: 'Veículo Híbrido (2 tanques)',
-    },
-    {
-      id: '6',
-      type: 'text',
-      text: 'Sobre o Carro',
-    },
-    {
-      id: '7',
-      type: 'input',
-      placeholder: 'Marca',
-      value: brand,
-      onChangeText: setBrand,
-    },
-    {
-      id: '8',
-      type: 'input',
-      placeholder: 'Modelo',
-      value: model,
-      onChangeText: setModel,
-    },
-    {
-      id: '9',
-      type: 'input',
-      placeholder: 'Ano',
-      value: year,
-      onChangeText: setYear,
-    },
-    {
-      id: '10',
-      type: 'input',
-      placeholder: 'Matrícula',
-      value: licensePlate,
-      onChangeText: setLicensePlate,
-    },
-  ];
-
   return (
     <View style={styles.container}>
-      <View style={{justifyContent: 'center',alignContent: 'center', width: '90%',}}>
+      <View style={{ justifyContent: 'center', alignContent: 'center', alignItems: 'center', width: '100%' }}>
         <View style={styles.card}>
           {imageUri ? (
             <Image source={{ uri: imageUri }} style={styles.image} />
@@ -131,14 +189,20 @@ const VehicleBuild = () => {
         </View>
       </View>
       <FlatList
-        data={data}
-        renderItem={renderCardItem}
-        keyExtractor={(item) => item.id}
+        ListHeaderComponent={renderCardItem}
         contentContainerStyle={styles.flatListContainer}
       />
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.saveButton}>
+          <Text style={styles.saveButtonText}>Salvar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.cancelButton} onPress={backScreen}>
+          <Text style={styles.cancelButtonText}>Cancelar</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
-};
+}; 
 
 const styles = StyleSheet.create({
   container: {
@@ -146,12 +210,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     marginTop: 50,
-    backgroundColor: '#f45'
+    backgroundColor: COLORS.bg,
   },
   card: {
-
-    width: '100%',
-    height: 250,
+    width: '90%',
+    height: 150,
     backgroundColor: COLORS.primary,
     borderRadius: 8,
     alignItems: 'center',
@@ -182,22 +245,20 @@ const styles = StyleSheet.create({
   flatListContainer: {
     width: '100%',
     paddingHorizontal: 2,
-    backgroundColor: '#ed3',
   },
   cardItem: {
     backgroundColor: COLORS.white,
-    padding: 2,
+    padding: 10,
+    paddingVertical: 15,
     borderRadius: 8,
     marginBottom: 16,
   },
-  inputContainer: {
+  input: {
     borderWidth: 1,
     borderColor: COLORS.gray,
     borderRadius: 8,
     paddingHorizontal: 8,
     marginBottom: 8,
-  },
-  input: {
     height: 40,
   },
   text: {
@@ -211,6 +272,41 @@ const styles = StyleSheet.create({
   },
   checkboxLabel: {
     marginLeft: 8,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 100
+    ,
+  },
+  saveButton: {
+    backgroundColor: '#EAB963',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    width: 100,
+    alignItems: 'center',
+  },
+  saveButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  cancelButton: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: '#EAB963',
+    width: 100,
+    alignItems: 'center',
+
+  },
+  cancelButtonText: {
+    color: '#EAB963',
+    fontWeight: 'bold',
   },
 });
 
