@@ -42,6 +42,7 @@ const NotAuthorized = () => {
       </View>
     </View>
   )
+      
 }
 
 export default NotAuthorized
