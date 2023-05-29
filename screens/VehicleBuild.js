@@ -12,7 +12,7 @@ const VehicleBuild = () => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [fuelType, setFuelType] = useState('');
-  const [hybrid, setHybrid] = useState(false);
+  const [hybrid, setHybrid] = useState('');
   const [brand, setBrand] = useState('');
   const [model, setModel] = useState('');
   const [year, setYear] = useState('');
@@ -47,21 +47,22 @@ const VehicleBuild = () => {
       console.log('Error selecting image:', error);
     }
   };
-  
+
   const saveDataToFirestore = () => {
     // Verificar se todos os campos foram preenchidos
     if (
       name === '' ||
-      description === '' ||
-      fuelType === '' ||
-      brand === '' ||
-      model === '' ||
-      year === '' ||
-      licensePlate === ''
+      description === null ||
+      fuelType === null ||
+      brand === null ||
+      model === null ||
+      year === null ||
+      licensePlate === null
     ) {
       Alert.alert('Por favor, preencha todos os campos');
       return;
     }
+
 
     // Obter o ID do usuário atual (supondo que você já tenha implementado a autenticação)
     const currentUserID = firebase.auth().currentUser.uid;
@@ -93,18 +94,19 @@ const VehicleBuild = () => {
     return (
       <>
         <View style={styles.cardItem}>
-          <TextInput
+        <TextInput
+            placeholder="Email"
             style={styles.input}
-            placeholder="Nome"
-            onChangeText={setName}
+            onTextInput={setName}
             value={name}
+
           />
         </View>
         <View style={styles.cardItem}>
           <TextInput
             style={styles.input}
             placeholder="Descrição"
-            onChangeText={setDescription}
+            onTextInput={setDescription}
             value={description}
           />
         </View>
@@ -126,7 +128,7 @@ const VehicleBuild = () => {
           <TextInput
             style={styles.input}
             placeholder="Veículo Híbrido (2 tanques)"
-            onChangeText={setFuelType}
+            onTextInput={setFuelType}
             value={fuelType}
           />
         </View>
@@ -148,25 +150,25 @@ const VehicleBuild = () => {
           <TextInput
             style={styles.input}
             placeholder="Marca"
-            onChangeText={setBrand}
+            onTextInput={setBrand}
             value={brand}
           />
           <TextInput
             style={styles.input}
             placeholder="Modelo"
-            onChangeText={setModel}
+            onTextInput={setModel}
             value={model}
           />
           <TextInput
             style={styles.input}
             placeholder="Ano"
-            onChangeText={setYear}
+            onTextInput={setYear}
             value={year}
           />
           <TextInput
             style={styles.input}
             placeholder="Matrícula"
-            onChangeText={setLicensePlate}
+            onTextInput={setLicensePlate}
             value={licensePlate}
           />
         </View>
@@ -191,6 +193,11 @@ const VehicleBuild = () => {
       <FlatList
         ListHeaderComponent={renderCardItem}
         contentContainerStyle={styles.flatListContainer}
+        keyboardShouldPersistTaps="always" // Adicionado para manter o teclado visível
+        keyboardDismissMode="on-drag" // Opcional, controla como o teclado é descartado
+
+
+     
       />
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.saveButton}>
@@ -202,7 +209,7 @@ const VehicleBuild = () => {
       </View>
     </View>
   );
-}; 
+};
 
 const styles = StyleSheet.create({
   container: {
