@@ -4,6 +4,8 @@ import MapScreen from './screens/MapScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import {decode, encode} from 'base-64'
+
 
 import MapView from 'react-native-maps';
 import SplashScreen from './screens/SplashScreen';
@@ -15,6 +17,10 @@ import TravelScreen from './screens/TravelScreen';
 import VehicleBuild from './screens/VehicleBuild';
 import NotAuthorized from './screens/NotAuthorized';
 import { COLORS } from './src/theme/theme';
+
+if (!global.btoa) {  global.btoa = encode }
+
+if (!global.atob) { global.atob = decode }
 
 export default function App() {
   const Stack = createNativeStackNavigator();

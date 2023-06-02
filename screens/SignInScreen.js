@@ -1,52 +1,62 @@
-import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Alert } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { COLORS } from '../src/theme/theme';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from '../firebase';
+import { auth, db } from '../firebase';
 import User from '../modules/mobileUser';
 import { CurrentUser, checkAsyncStorageData, getUser } from '../database/Database';
 import { LoginCredentialData } from '../database/LoginCredential';
 
 const SignInScreen = () => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const navigation = useNavigation();
 
-  const handleSignUp = () => {
-    console.log(email + password)
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(userCredentials => {
-        const user = userCredentials.user;
-        console.log('Registered with:', user.email)
-      }).then(() => {
-
-        User.pop();
-        User.push({
-          email
-        })
-        navigation.replace('Tab')
-
-      })
-      .catch(error => alert(error.message))
-  }
-
-  
-
-  const handleLogin = async () => {
-    console.log("*****************************************")
+  const handleSignUp = async () => {
     try {
-      const userCredentials = await signInWithEmailAndPassword(auth, email, password);
+      const userCredentials = await auth.createUserWithEmailAndPassword(email, password);
       const user = userCredentials.user;
+  
+      console.log('Registered with:', user.email);
   
       const userInstance = new CurrentUser();
       await userInstance.insertUser(user);
   
       const retrievedUser = await getUser();
-      LoginCredentialData.push(await retrievedUser)
+      LoginCredentialData.push(await retrievedUser);
+  
+      const userID = user.uid; // Obtém o ID do usuário
 
+      await db.collection('users').doc(userID).set({
+        email: user.email
+        // Outras informações adicionais do usuário
+      });
+  
+      // Sucesso na criação da conta
+      Alert.alert('Conta de usuário criada com sucesso!');
+  
+      navigation.replace('Tab');
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+  
+  
+
+  const handleLogin = async () => {
+    console.log("*****************************************");
+    try {
+      const userCredentials = await auth.signInWithEmailAndPassword(email, password);
+      const user = userCredentials.user;
+
+      const userInstance = new CurrentUser();
+      await userInstance.insertUser(user);
+
+      const retrievedUser = await getUser();
+      LoginCredentialData.push(await retrievedUser);
     } catch (error) {
       console.log(error);
       alert(error.message);
@@ -54,8 +64,8 @@ const SignInScreen = () => {
       setLoading(false);
       navigation.replace('Tab');
     }
-  }
-  
+  };
+
   return (
     <View style={{ backgroundColor: COLORS.bg, height: '100%' }}>
       <View style={{ alignItems: 'center', marginTop: 40 }}>
@@ -69,7 +79,6 @@ const SignInScreen = () => {
             placeholder="Email"
             style={styles.input}
             onChangeText={text => setEmail(text.trim())}
-
           />
         </View>
         <View style={{ marginTop: 20 }}>
@@ -78,7 +87,6 @@ const SignInScreen = () => {
             secureTextEntry={true}
             style={styles.input}
             onChangeText={text => setPassword(text)}
-
           />
         </View>
         <TouchableOpacity>
@@ -92,9 +100,7 @@ const SignInScreen = () => {
           <TouchableOpacity style={styles.registerButton} onPress={handleSignUp}>
             <Text style={styles.buttonRe}>Criar conta</Text>
           </TouchableOpacity>
-
         </View>
-
       </View>
     </View>
   );
@@ -151,7 +157,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F7F9',
     borderRadius: 8,
     minWidth: 100,
-
     borderWidth: 1,
     borderColor: '#EAB963',
     paddingVertical: 10,

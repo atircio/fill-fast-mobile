@@ -1,76 +1,115 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { COLORS } from '../src/theme/theme';
 import { AntDesign } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import NotAuthorized from './NotAuthorized';
 import { LoginCredentialData } from '../database/LoginCredential';
+import { db } from '../firebase';
+import { decode, encode } from 'base-64';
+import { getElapsedTimeFromUTC } from '../src/helpers/dataFormater';
+
 
 const VehicleScreen = () => {
-
   const navigation = useNavigation();
-
   const Press = () => {
-    navigation.replace('Tab')
-  }
-  const goToVehicleBuild = () => {
-    navigation.navigate('VehicleBuild')
-  }
+    navigation.replace('Tab');
+  };
 
-  const userWithEmail = LoginCredentialData.find((item) => item && item.email);
+  const userWithEmail = LoginCredentialData.find((item) => item && item.uid);
   const result = userWithEmail || null;
 
-  const data = [
-    { id: '1', title: 'Veículo 1' },
-    { id: '2', title: 'Veículo 2' },
-    { id: '3', title: 'Veículo 3' },
 
+  const goToVehicleBuild = ({ item }) => {
+    navigation.navigate('VehicleBuild', {
+      carName: item.name,
+      uid: result.uid
+    });
+  };
+  const goToVehicleBuildEmpty = () => {
+    navigation.navigate('VehicleBuild');
+  };
+  const [data, setData] = useState([]);
+  const [imageError, setImageError] = useState(false);
 
-  ];
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
+  const getVehiclesByUserID = async () => {
+    try {
+      const querySnapshot = await db
+        .collection('users')
+        .doc(result.uid)
+        .collection('veiculos')
+        .get();
+
+      const vehicles = [];
+
+      querySnapshot.forEach((doc) => {
+        const vehicleData = doc.data();
+        console.log(vehicleData)
+        vehicles.push(vehicleData);
+      });
+
+      setData(vehicles); // Update the data array with the fetched vehicles
+    } catch (error) {
+      console.error('Erro ao obter os veículos: ', error);
+    }
+  };
+
+  useEffect(() => {
+    if (result) {
+      getVehiclesByUserID();
+    }
+  }, [result]);
 
   const renderListItem = ({ item }) => (
-    <TouchableOpacity onPress={goToVehicleBuild}>
+    <TouchableOpacity onPress={() => goToVehicleBuild({ item })}>
       <View style={styles.item}>
         <Image
-          source={require('../assets/carDefault.png')}
-          style={styles.itemImage}
-        />
+          source={
+            !imageError && item.imageURL !== ''
+              ? { uri: item.imageURL }
+              : require('../assets/carDefault.png')
+          }
+          onError={handleImageError}
+          style={styles.itemImage} />
         <View style={styles.itemDetails}>
-          <Text style={styles.itemTitle}>{item.title}</Text>
-          <Text style={styles.itemDescription}>Ano: 2022</Text>
+          <Text style={styles.itemTitle}>{item.name}</Text>
+          <Text style={styles.itemDescription}>Modificado à: {getElapsedTimeFromUTC(item.createdAt)}</Text>
         </View>
-        <TouchableOpacity style={styles.itemButton} onPress={goToVehicleBuild}>
+        <TouchableOpacity style={styles.itemButton} onPress={() => goToVehicleBuild({ item })}>
           <AntDesign name="arrowright" size={16} color="white" />
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
-
   );
 
-  if(result){
+  if (result) {
     return (
       <View style={{ backgroundColor: COLORS.bg, height: '100%' }}>
         <View style={styles.container}>
           <View style={{ alignItems: 'center', marginTop: 40 }}>
-            <Image source={require('../assets/CarS.gif')} style={{ width: 200, height: 200 }} />
+
+            <Image source={require('../assets/CarS.gif')}
+              style={{ width: 200, height: 200 }} />
             <Text style={styles.title}>Configure os seus veículos</Text>
           </View>
           <FlatList
-            data={data}
+            data={data.slice().sort((a, b) => b.createdAt - a.createdAt)}
             renderItem={renderListItem}
             keyExtractor={(item) => item.id}
           />
         </View>
-        <TouchableOpacity style={styles.floatingButton} onPress={goToVehicleBuild}>
+        <TouchableOpacity style={styles.floatingButton} onPress={goToVehicleBuildEmpty}>
           <AntDesign name="plus" size={24} color="white" />
         </TouchableOpacity>
       </View>
     );
-  }else{
-    return(<NotAuthorized/>)
+  } else {
+    return <NotAuthorized />;
   }
-
-  
 };
 
 export default VehicleScreen;
