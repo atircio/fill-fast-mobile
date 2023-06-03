@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Alert } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { COLORS } from '../src/theme/theme';
 import { AntDesign } from '@expo/vector-icons';
@@ -9,7 +9,6 @@ import { db } from '../firebase';
 import { decode, encode } from 'base-64';
 import { getElapsedTimeFromUTC } from '../src/helpers/dataFormater';
 
-
 const VehicleScreen = () => {
   const navigation = useNavigation();
   const Press = () => {
@@ -19,16 +18,17 @@ const VehicleScreen = () => {
   const userWithEmail = LoginCredentialData.find((item) => item && item.uid);
   const result = userWithEmail || null;
 
-
   const goToVehicleBuild = ({ item }) => {
     navigation.navigate('VehicleBuild', {
-      carName: item.name,
+      carID: item.id,
       uid: result.uid
     });
   };
+
   const goToVehicleBuildEmpty = () => {
     navigation.navigate('VehicleBuild');
   };
+
   const [data, setData] = useState([]);
   const [imageError, setImageError] = useState(false);
 
@@ -48,7 +48,7 @@ const VehicleScreen = () => {
 
       querySnapshot.forEach((doc) => {
         const vehicleData = doc.data();
-        console.log(vehicleData)
+        console.log(vehicleData);
         vehicles.push(vehicleData);
       });
 
@@ -64,8 +64,42 @@ const VehicleScreen = () => {
     }
   }, [result]);
 
+  const deleteVehicle = async (vehicleId) => {
+    try {
+      await db
+        .collection('users')
+        .doc(result.uid)
+        .collection('veiculos')
+        .doc(vehicleId)
+        .delete();
+
+      // Refresh the data after deletion
+      getVehiclesByUserID();
+    } catch (error) {
+      console.error('Erro ao eliminar veículo: ', error);
+    }
+  };
+
+  const confirmDeleteVehicle = (item) => {
+    Alert.alert(
+      'Eliminar Veículo',
+      `Deseja eliminar o veículo ${item.name}?`,
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Sim',
+          onPress: () => deleteVehicle(item.id),
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
   const renderListItem = ({ item }) => (
-    <TouchableOpacity onPress={() => goToVehicleBuild({ item })}>
+    <TouchableOpacity onPress={() => goToVehicleBuild({ item })} onLongPress={() => confirmDeleteVehicle(item)}>
       <View style={styles.item}>
         <Image
           source={
@@ -74,7 +108,8 @@ const VehicleScreen = () => {
               : require('../assets/carDefault.png')
           }
           onError={handleImageError}
-          style={styles.itemImage} />
+          style={styles.itemImage}
+        />
         <View style={styles.itemDetails}>
           <Text style={styles.itemTitle}>{item.name}</Text>
           <Text style={styles.itemDescription}>Modificado à: {getElapsedTimeFromUTC(item.createdAt)}</Text>
@@ -91,9 +126,7 @@ const VehicleScreen = () => {
       <View style={{ backgroundColor: COLORS.bg, height: '100%' }}>
         <View style={styles.container}>
           <View style={{ alignItems: 'center', marginTop: 40 }}>
-
-            <Image source={require('../assets/CarS.gif')}
-              style={{ width: 200, height: 200 }} />
+            <Image source={require('../assets/CarS.gif')} style={{ width: 200, height: 200 }} />
             <Text style={styles.title}>Configure os seus veículos</Text>
           </View>
           <FlatList

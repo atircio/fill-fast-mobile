@@ -23,6 +23,9 @@ const VehicleBuild = ({ route }) => {
   const [data, setData] = useState([]); // Initialize data with an empty array
   const [isLoading, setIsLoading] = useState(true); // Adiciona a variável isLoading
 
+  const [IdCar, setIdCar] = useState(null);
+
+
 
   const navigation = useNavigation();
 
@@ -35,34 +38,40 @@ const VehicleBuild = ({ route }) => {
 
   useEffect(() => {
     if (route.params) {
-      const { carName } = route.params;
-      getVehiclesByUserID(carName);
+      const { carID } = route.params;
+      setIdCar(carID);
+      getVehiclesByUserID(carID);
     }
   }, [route]);
+  
 
 
-  const getVehiclesByUserID = async (carName) => {
+  const getVehiclesByUserID = async (carID) => {
     try {
       const userWithEmail = LoginCredentialData.find((item) => item && item.email);
       const currentUserID = userWithEmail ? userWithEmail.uid : null;
-
+  
       if (!currentUserID) {
         console.error('Erro: Usuário não autenticado');
         return;
       }
-
+  
       const querySnapshot = await db
         .collection('users')
         .doc(currentUserID)
         .collection('veiculos')
-        .doc(carName)
+        .where('id', '==', carID)
         .get();
-
-      const vehicleData = querySnapshot.data() || {};
+  
+      let vehicleData = {};
+      querySnapshot.forEach((doc) => {
+        vehicleData = doc.data();
+      });
+  
       setData(vehicleData);
-      setIsLoading(false); // Define isLoading como false após obter os 
+      setIsLoading(false);
       console.log(vehicleData);
-
+  
       // Preencher Inputs com os dados do objeto data
       setName(vehicleData.name);
       setDescription(vehicleData.description);
@@ -72,10 +81,10 @@ const VehicleBuild = ({ route }) => {
       setModel(vehicleData.model);
       setYear(vehicleData.year);
       setLicensePlate(vehicleData.licensePlate);
-      setImageUri(vehicleData.imageURL)
-
+      setImageUri(vehicleData.imageURL);
+  
     } catch (error) {
-      setIsLoading(false)
+      setIsLoading(false);
       console.error('Erro ao obter os veículos:', error);
     }
   };
@@ -105,7 +114,7 @@ const VehicleBuild = ({ route }) => {
 
   const saveDataToFirestore = async () => {
     if (name === '') {
-      Alert.alert('Por favor, preencha todos os campos');
+      Alert.alert('O nome é um campo obrigatório');
       return;
     }
   
@@ -166,8 +175,74 @@ const VehicleBuild = ({ route }) => {
     } catch (error) {
       setIsLoading(false); // Hide the loading indicator
       Alert.alert('Erro ao salvar os dados: ', error.message);
+      backToFirstScreen();
+
     }
   };
+
+  const updateDataInFirestore = async () => {
+    try {
+      setIsLoading(true); // Show the loading indicator
+  
+      // Autenticar o usuário atual
+      const userWithEmail = LoginCredentialData.find((item) => item && item.email);
+      const currentUserID = userWithEmail ? userWithEmail.uid : null;
+  
+      if (!currentUserID) {
+        setIsLoading(false); // Hide the loading indicator
+        Alert.alert('Erro: Usuário não autenticado');
+        return;
+      }
+  
+      const vehicleDocRef = db
+        .collection('users')
+        .doc(currentUserID)
+        .collection('veiculos')
+        .doc(IdCar);
+
+        let imageURL = '';
+  
+      if (imageUri) {
+        // Salvar a imagem no Firebase Storage
+        const imageFileName = `${currentUserID}_${name}.jpg`; // Nome do arquivo com base no ID do usuário e no nome do veículo
+        const response = await fetch(imageUri);
+        const blob = await response.blob();
+        const storageRef = storage.ref().child(imageFileName);
+        await storageRef.put(blob);
+  
+        // Obter a URL da imagem salva no Firebase Storage
+        imageURL = await storageRef.getDownloadURL();
+      }
+
+        const currentUTC = firebase.firestore.Timestamp.now();
+
+
+
+        data.brand = brand;
+        data.createdAt = currentUTC;
+        data.description = description;
+        data.fuelType = fuelType;
+        data.hybrid = hybrid;
+        data.imageURL = imageURL;
+        data.licensePlate = licensePlate;
+        data.model = model;
+        data.name = name;
+        data.year = year;
+
+  
+      await vehicleDocRef.update(data);
+  
+      setIsLoading(false); // Hide the loading indicator
+      Alert.alert('Dados atualizados com sucesso!');
+      backToFirstScreen()
+    } catch (error) {
+      setIsLoading(false); // Hide the loading indicator
+      Alert.alert('Erro ao atualizar os dados: ', error.message);
+      backToFirstScreen()
+
+    }
+  };
+  
   
   
   if (route.params) {
@@ -196,7 +271,7 @@ const VehicleBuild = ({ route }) => {
             placeholder="Nome"
             style={styles.input}
             onChangeText={setName}
-            value={data.name}
+            value={name}
           />
           <TextInput
             style={styles.input}
@@ -251,7 +326,7 @@ const VehicleBuild = ({ route }) => {
           />
         </View>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.saveButton} onPress={saveDataToFirestore}>
+          <TouchableOpacity style={styles.saveButton} onPress={updateDataInFirestore}>
             <Text style={styles.saveButtonText}>Salvar</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.cancelButton} onPress={backScreen}>
