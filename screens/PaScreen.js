@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import { AntDesign, Ionicons, FontAwesome5, Feather } from '@expo/vector-icons';
 import { COLORS } from '../src/theme/theme';
 import { useNavigation } from '@react-navigation/native';
 
 const PaScreen = ({ route }) => {
   const { id, name, rating, reviews, imageReference, address, latitude2, longitude2 } = route.params;
-  const API_KEY = 'AIzaSyA1elJaTMHC0I1_IyFlt4x31_lu-AoB_Vc';
+  const API_KEY = 'YOUR_API_KEY';
   const [imageError, setImageError] = useState(false);
   const handleImageError = () => {
     setImageError(true);
@@ -23,39 +23,32 @@ const PaScreen = ({ route }) => {
       name: "Gasóleo",
       price: "160"
     }
-  ]
-
+  ];
 
   const navigation = useNavigation();
- 
 
   const pressToTravel = () => {
-    navigation.navigate('PaScreen', 
-    {
+    navigation.navigate('PaScreen', {
       latitude: item.latitude,
       longitude: item.longitude,
-    })
-  }
+    });
+  };
 
   const Press = () => {
-    navigation.navigate('TravelScreen', 
-    {
+    navigation.navigate('TravelScreen', {
       lat: latitude2,
       lon: longitude2,
-    })
-  }
-
-
-
+    });
+  };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={{ width: '100%' }}>
-        <View >
+        <View>
           <Image
             style={styles.paImage}
             source={
-          /*!imageError
+              /*!imageError
             ? { uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${styles.paImage.width}&photoreference=${imageReference}&key=${API_KEY}` }
             :*/ require('../assets/imgDefaultGas.jpg')
             }
@@ -63,15 +56,14 @@ const PaScreen = ({ route }) => {
           />
         </View>
 
-
         <View style={styles.details}>
           <View style={styles.paRow}>
-            <View style={{ justifyContent: 'space-around', flex: 1, }}>
-              <Text style={[styles.paLabel, { width: '100%' }]} numberOfLines={1} ellipsizeMode='tail'>{name}</Text>
+            <View style={{ justifyContent: 'space-around', flex: 1 }}>
+              <Text style={[styles.paLabel, { width: '100%' }]} numberOfLines={1} ellipsizeMode="tail">{name}</Text>
               <View style={styles.paRow}>
                 <AntDesign name="staro" style={styles.paStars} />
-                <Text style={{ color: COLORS.gold, marginLeft: 2, }}>{rating}</Text>
-                <Text style={{ color: COLORS.dark, marginLeft: 8 }}>{reviews}</Text>
+                <Text style={{ color: COLORS.gold, marginLeft: 2 }}>{rating}</Text>
+                <Text style={{ color: COLORS.dark, marginLeft: 8 }}>({reviews})</Text>
               </View>
             </View>
             <TouchableOpacity style={styles.favPa}>
@@ -110,11 +102,10 @@ const PaScreen = ({ route }) => {
           </View>
           <View style={{ marginTop: 20, marginBottom: 20 }}>
             <Text style={{ color: COLORS.grey }}>Combustiveis</Text>
-            <Text style={{color: COLORS.grey, marginTop:1, fontSize:18}}>Preço</Text>
-            <Text style={{marginTop:2, color: COLORS.dark, fontWeight:'700'}}>160 kz/l</Text>
+            <Text style={{ color: COLORS.grey, marginTop: 1, fontSize: 18 }}>Preço</Text>
+            <Text style={{ marginTop: 2, color: COLORS.dark, fontWeight: '700' }}>160 kz/l</Text>
           </View>
-          
-          
+
           <FlatList
             horizontal={true}
             data={fuels}
@@ -124,39 +115,29 @@ const PaScreen = ({ route }) => {
                 <TouchableOpacity style={{ marginRight: 10, backgroundColor: COLORS.brown, flex: 0, borderRadius: 20, height: 30, paddingHorizontal: 10, paddingVertical: 5 }}>
                   <Text style={{ color: COLORS.white }}>{item.name}</Text>
                 </TouchableOpacity>
-
               </View>
-
             )}
           />
-         
-
-
-
         </View>
-
-
-
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 export default PaScreen;
 
 const styles = StyleSheet.create({
-
   timeDistanceContainer: {
     backgroundColor: COLORS.bg,
     borderRadius: 8,
     paddingTop: 10,
-    flex: 0, justifyContent: 'space-between',
+    flex: 0,
+    justifyContent: 'space-between',
     paddingVertical: 10,
     paddingHorizontal: 20
   },
-
   container: {
-
+    flex: 1,
   },
   paImage: {
     width: '100%',
@@ -164,7 +145,6 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
-
   },
   details: {
     bottom: 0,
@@ -177,7 +157,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     elevation: 1,
-
   },
   paRow: {
     flexDirection: 'row',
@@ -188,9 +167,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 0,
     justifyContent: 'space-between',
-
   },
-
   paStars: {
     fontSize: 24,
     color: COLORS.gold
@@ -219,7 +196,6 @@ const styles = StyleSheet.create({
     right: 0,
     alignItems: 'center',
     justifyContent: 'center'
-
   },
   routeItemContainer: {
     backgroundColor: COLORS.bg,
@@ -233,7 +209,6 @@ const styles = StyleSheet.create({
     right: 0,
     alignItems: 'center',
     justifyContent: 'center'
-
   },
   locationIconContainer: {
     backgroundColor: COLORS.white,
@@ -248,12 +223,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10
-
   },
   likeIcon: {
     fontSize: 25,
     color: COLORS.white,
   }
-
-
 });

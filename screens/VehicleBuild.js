@@ -44,8 +44,6 @@ const VehicleBuild = ({ route }) => {
     }
   }, [route]);
   
-
-
   const getVehiclesByUserID = async (carID) => {
     try {
       const userWithEmail = LoginCredentialData.find((item) => item && item.email);
