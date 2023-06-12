@@ -25,8 +25,6 @@ const VehicleBuild = ({ route }) => {
 
   const [IdCar, setIdCar] = useState(null);
 
-
-
   const navigation = useNavigation();
 
   const backScreen = () => {
@@ -145,7 +143,6 @@ const VehicleBuild = ({ route }) => {
   
       const currentUTC = firebase.firestore.Timestamp.now();
   
-      // Criar um ID único para o veículo
       const vehicleDocRef = db
         .collection('users')
         .doc(currentUserID)

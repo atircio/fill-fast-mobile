@@ -31,6 +31,14 @@ const AlertsBuild = ({ route }) => {
   };
 
   useEffect(() => {
+    if (route.params) {
+      const { carID } = route.params;
+      setIdCar(carID);
+      getVehiclesByUserID(carID);
+    }
+  }, [route]);
+
+  useEffect(() => {
     // Code to fetch initial data
     fetchData();
   }, []);
@@ -54,9 +62,38 @@ const AlertsBuild = ({ route }) => {
       });
   };
 
-  const updateDataInFirestore = () => {
-    // Code to update data in Firestore
-    // Example:
+  const saveDataInFirestore = () => {
+    if (title === '') {
+      Alert.alert('O título é um campo obrigatório');
+      return;
+    }
+    try {
+
+      setIsLoading(true); // Show the loading indicator
+  
+      // Autenticar o usuário atual
+      const userWithEmail = LoginCredentialData.find((item) => item && item.email);
+      const currentUserID = userWithEmail ? userWithEmail.uid : null;
+
+      if (!currentUserID) {
+        setIsLoading(false); // Hide the loading indicator
+        Alert.alert('Erro: Usuário não autenticado');
+        return;
+      }
+
+      const currentUTC = firebase.firestore.Timestamp.now();
+
+      const vehicleDocRef = db
+        .collection('users')
+        .doc(currentUserID)
+        .collection('veiculos')
+        .doc();
+
+  
+      
+    } catch (error) {
+      
+    }
     db.collection('alerts')
       .doc('exampleId')
       .update({
@@ -69,7 +106,7 @@ const AlertsBuild = ({ route }) => {
         repeatOption,
       })
       .then(() => {
-        console.log('Document successfully updated!');
+        Alert.alert('Lembrete salvo com sucesso!');
         fetchData(); // Fetch updated data after successful update
         navigation.goBack();
       })
