@@ -18,6 +18,7 @@ import VehicleBuild from './screens/VehicleBuild';
 import NotAuthorized from './screens/NotAuthorized';
 import { COLORS } from './src/theme/theme';
 import AlertsBuild from './screens/AlertsBuild';
+import AlertsList from './screens/AlertsList';
 
 if (!global.btoa) {  global.btoa = encode }
 
@@ -77,6 +78,13 @@ export default function App() {
           <Stack.Screen
             name="TravelScreen"
             component={TravelScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="AlertsList"
+            component={AlertsList}
             options={{
               headerShown: false,
             }}

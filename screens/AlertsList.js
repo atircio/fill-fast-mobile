@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Alert, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Alert } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { COLORS } from '../src/theme/theme';
 import { AntDesign } from '@expo/vector-icons';
@@ -9,10 +9,21 @@ import { db } from '../firebase';
 import { decode, encode } from 'base-64';
 import { getElapsedTimeFromUTC } from '../src/helpers/dataFormater';
 
-const { width } = Dimensions.get('window');
-
-const AlertsScreen = () => {
+const AlertsList = ({ route }) => {
   const navigation = useNavigation();
+  const [IdCar, setIdCar] = useState(null);
+
+  useEffect(() => {
+    if (route.params) {
+      const { carID } = route.params;
+      setIdCar(carID);
+      console.log(carID)
+      getVehiclesByUserID(carID)
+      }
+
+  }, [route]);
+
+
   const Press = () => {
     navigation.replace('Tab');
   };
@@ -21,7 +32,7 @@ const AlertsScreen = () => {
   const result = userWithEmail || null;
 
   const goToVehicleBuild = ({ item }) => {
-    navigation.navigate('AlertsList', {
+    navigation.navigate('VehicleBuild', {
       carID: item.id,
       uid: result.uid
     });
@@ -38,23 +49,25 @@ const AlertsScreen = () => {
     setImageError(true);
   };
 
-  const getVehiclesByUserID = async () => {
+  const getVehiclesByUserID = async (carID) => {
     try {
       const querySnapshot = await db
         .collection('users')
         .doc(result.uid)
         .collection('veiculos')
+        .doc(carID)
+        .collection('alerts')
         .get();
 
-      const vehicles = [];
+      const alerts = [];
 
       querySnapshot.forEach((doc) => {
         const vehicleData = doc.data();
         console.log(vehicleData);
-        vehicles.push(vehicleData);
+        alerts.push(vehicleData);
       });
 
-      setData(vehicles); // Update the data array with the fetched vehicles
+      setData(alerts); // Update the data array with the fetched vehicles
     } catch (error) {
       console.error('Erro ao obter os veículos: ', error);
     }
@@ -84,7 +97,7 @@ const AlertsScreen = () => {
 
   const confirmDeleteVehicle = (item) => {
     Alert.alert(
-      'Eliminar Veículo',
+      'Eliminar Lembrete',
       `Deseja eliminar o veículo ${item.name}?`,
       [
         {
@@ -101,7 +114,7 @@ const AlertsScreen = () => {
   };
 
   const renderListItem = ({ item }) => (
-    <TouchableOpacity style={{}} onPress={() => goToVehicleBuild({ item })} onLongPress={() => confirmDeleteVehicle(item)}>
+    <TouchableOpacity onPress={() => goToVehicleBuild({ item })} onLongPress={() => confirmDeleteVehicle(item)}>
       <View style={styles.item}>
         <Image
           source={
@@ -113,7 +126,7 @@ const AlertsScreen = () => {
           style={styles.itemImage}
         />
         <View style={styles.itemDetails}>
-          <Text style={styles.itemTitle}>{item.name}</Text>
+          <Text style={styles.itemTitle}>{item.title}</Text>
           <Text style={styles.itemDescription}>Modificado à: {getElapsedTimeFromUTC(item.createdAt)}</Text>
         </View>
         <TouchableOpacity style={styles.itemButton} onPress={() => goToVehicleBuild({ item })}>
@@ -128,17 +141,18 @@ const AlertsScreen = () => {
       <View style={{ backgroundColor: COLORS.bg, height: '100%' }}>
         <View style={styles.container}>
           <View style={{ alignItems: 'center', marginTop: 40 }}>
-            <Image source={require('../assets/notification.gif')} style={{ width: 200, height: 200 }} />
-            <Text style={styles.title}>Crie lembretes para os seus veiculos</Text>
+            <Image source={require('../assets/CarS.gif')} style={{ width: 200, height: 200 }} />
+            <Text style={styles.title}>Configure os seus veículos</Text>
           </View>
           <FlatList
             data={data.slice().sort((a, b) => b.createdAt - a.createdAt)}
             renderItem={renderListItem}
             keyExtractor={(item) => item.id}
-            numColumns={2} // Define 2 columns per row
-            contentContainerStyle={styles.listContent}
           />
         </View>
+        <TouchableOpacity style={styles.floatingButton} onPress={goToVehicleBuildEmpty}>
+          <AntDesign name="plus" size={24} color="white" />
+        </TouchableOpacity>
       </View>
     );
   } else {
@@ -146,7 +160,7 @@ const AlertsScreen = () => {
   }
 };
 
-export default AlertsScreen;
+export default AlertsList;
 
 const styles = StyleSheet.create({
   container: {
@@ -171,27 +185,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 50,
   },
-  listContent: {
-    paddingHorizontal: 16, // Add horizontal padding to align items in the center
-    paddingTop: 12,
-    paddingBottom: 50,
-     justifyContent: 'space-between',
-    alignContent: 'space-between',
-    alignSelf: 'flex-start'
-
-  },
   item: {
     backgroundColor: COLORS.white,
     borderRadius: 8,
-    flexDirection: 'column', // Arrange the components horizontally
+    flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
     paddingHorizontal: 16,
     marginBottom: 12,
     elevation: 2,
-    width: (width - 50) / 2,
-    marginLeft: 8, // Add a left margin to create horizontal spacing
-
   },
   itemImage: {
     width: 60,
@@ -200,7 +202,7 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   itemDetails: {
-    flex: 1, // Take up remaining space in the row
+    flex: 1,
     marginLeft: 16,
   },
   itemTitle: {
