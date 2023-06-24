@@ -7,7 +7,7 @@ import { LocationAccuracy, getCurrentPositionAsync, requestForegroundPermissions
 import MapViewDirections from 'react-native-maps-directions';
 import { useNavigation } from '@react-navigation/native';
 
-const API_KEY = 'AIzaSyA1elJaTMHC0I1_IyFlt4x31_lu-AoB_Vc';
+const API_KEY = 'AIzaSyAt9UZDa-5DO4Kav_aRyyA1kOB83NEz0xY';
 
 
 const MapScreenFooter = () => {

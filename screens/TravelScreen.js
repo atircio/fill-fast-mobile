@@ -8,7 +8,7 @@ import { COLORS } from '../src/theme/theme';
 const TravelScreen = ({ route }) => {
   const { lat, lon } = route.params;
 
-  const YOUR_GOOGLE_MAPS_API_KEY = 'AIzaSyA1elJaTMHC0I1_IyFlt4x31_lu-AoB_Vc';
+  const YOUR_GOOGLE_MAPS_API_KEY = 'AIzaSyAt9UZDa-5DO4Kav_aRyyA1kOB83NEz0xY';
   const mapRef = useRef(null);
   const [location, setLocation] = useState(null);
   const [distance, setDistance] = useState('');
