@@ -55,6 +55,7 @@ const AccountScreen = () => {
         <View style={styles.profileContainer}>
           <Image source={require('../assets/profile-pic.png')} style={styles.profileImage} />
           <Text style={styles.email}>{user ? user.email : 'Faça Login'}</Text>
+          <Text style={styles.email}>{user ? user.email : 'Faça Login'}</Text>
         </View>
         <View style={styles.separator} />
 
@@ -101,7 +102,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   profileImage: {
-    width: 100,
+    width: 101,
     height: 100,
     borderRadius: 50,
     marginRight: 10,
