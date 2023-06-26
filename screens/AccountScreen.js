@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, Image, Alert } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, Image, Alert, Linking } from 'react-native';
 import { AntDesign, Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { COLORS } from '../src/theme/theme';
 import { CurrentUser, getUser } from '../database/Database';
@@ -8,6 +8,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth } from '../firebase';
 import { LoginCredentialData } from '../database/LoginCredential';
 import NotAuthorized from './NotAuthorized';
+import Swiper from 'react-native-swiper';
+
 
 
 const AccountScreen = () => {
@@ -45,6 +47,18 @@ const AccountScreen = () => {
     }
   };
 
+  const handleWhatsApp = () => {
+    Linking.openURL('whatsapp://send?text=Olá!&phone=SEU_NUMERO');
+  };
+
+  const handleEmail = () => {
+    Linking.openURL('mailto:SEU_EMAIL');
+  };
+
+  const handleLinkedIn = () => {
+    Linking.openURL('SEU_PERFIL_LINKEDIN');
+  };
+
   const userWithEmail = LoginCredentialData.find((item) => item && item.email);
   const result = userWithEmail || null;
 
@@ -56,6 +70,7 @@ const AccountScreen = () => {
           <Image source={require('../assets/profile-pic.png')} style={styles.profileImage} />
           <Text style={styles.email}>{user ? user.email : 'Faça Login'}</Text>
         </View>
+
         <View style={styles.separator} />
 
         {/* Options list */}
@@ -75,9 +90,35 @@ const AccountScreen = () => {
             <Text style={styles.optionText}>Logout</Text>
           </TouchableOpacity>
         </View>
+
+        <Swiper
+          style={styles.swiperContainer}
+          autoplay
+          autoplayTimeout={1000}GPS 
+          loop
+        >
+            <Image source={require('../assets/gps.gif')} style={{ width: 100, height: 100 }} />
+        </Swiper>
+
+        {/* Contact buttons */}
+        <View style={styles.contactContainer}>
+          <TouchableOpacity style={styles.contactButton} onPress={handleWhatsApp}>
+            <FontAwesome5 name="whatsapp" size={24} color={COLORS.black} />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.contactButton} onPress={handleEmail}>
+            <FontAwesome5 name="envelope" size={24} color={COLORS.black} />
+            
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.contactButton} onPress={handleLinkedIn}>
+            <FontAwesome5 name="linkedin" size={24} color={COLORS.black} />
+          </TouchableOpacity>
+        </View>
       </View>
+
     );
-  }else{
+  } else {
     return (
       <NotAuthorized />
     );
@@ -89,37 +130,44 @@ const AccountScreen = () => {
 export default AccountScreen;
 
 const styles = StyleSheet.create({
+
+
   container: {
-    backgroundColor: COLORS.bg,
     flex: 1,
-    alignItems: 'flex-start',
+    backgroundColor: COLORS.bg,
+    paddingHorizontal: 20,
+    paddingTop: 40,
   },
+
+  swiperContainer: {
+    height: 100,
+
+  },
+
   profileContainer: {
-    marginTop: 40,
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
-    paddingHorizontal: 20,
   },
   profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginRight: 11,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    marginRight: 20,
   },
   email: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
-    marginLeft: 10,
+    color: COLORS.black,
   },
   separator: {
     height: 1,
     width: '100%',
-    backgroundColor: 'gray',
+    backgroundColor: COLORS.gray,
     marginBottom: 20,
   },
   optionContainer: {
-    padding: 10,
+    paddingVertical: 10,
     width: '100%',
   },
   option: {
@@ -127,15 +175,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
     backgroundColor: COLORS.white,
-    padding: 10,
-    width: '100%',
-    borderBottomColor: COLORS.gold,
-    borderBottomWidth: 2,
+    padding: 15,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: COLORS.gold,
   },
   optionText: {
     marginLeft: 10,
     fontSize: 16,
     fontWeight: 'bold',
+    color: COLORS.black,
   },
-  
+  contactContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  contactButton: {
+    marginHorizontal: 10,
+  },
 });
