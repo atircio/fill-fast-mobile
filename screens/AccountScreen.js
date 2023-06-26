@@ -99,6 +99,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
+    paddingHorizontal: 20,
   },
   profileImage: {
     width: 100,
@@ -109,6 +110,7 @@ const styles = StyleSheet.create({
   email: {
     fontSize: 16,
     fontWeight: 'bold',
+    marginLeft: 10,
   },
   separator: {
     height: 1,
@@ -123,7 +125,6 @@ const styles = StyleSheet.create({
   option: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: '80%',
     marginBottom: 10,
     backgroundColor: COLORS.white,
     padding: 10,
@@ -136,4 +137,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  
 });

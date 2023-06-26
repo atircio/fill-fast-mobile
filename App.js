@@ -32,7 +32,7 @@ export default function App() {
 
     <NavigationContainer>
       <SafeAreaView style={styles.container}>
-        <Stack.Navigator initialRouteName='AlertsBuild'>
+        <Stack.Navigator initialRouteName='SplashScreen'>
           <Stack.Screen
             name="SplashScreen"
             component={SplashScreen}

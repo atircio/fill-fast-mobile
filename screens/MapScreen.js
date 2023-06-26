@@ -6,7 +6,7 @@ import {
   requestForegroundPermissionsAsync, getCurrentPositionAsync, LocationObject, watchPositionAsync, LocationAccuracy
 } from 'expo-location';
 
-const GOOGLE_API_KEY = 'AIzaSyA1elJaTMHC0I1_IyFlu-t4x31_lAoB_Vc'
+const GOOGLE_API_KEY = 'AIzaSyA1elJaTMHC0I1_IyFlu-t4x31_lAoB_Vcc'
 
 const MapScreen = () => {
 

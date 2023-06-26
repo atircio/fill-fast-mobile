@@ -50,6 +50,11 @@ const WelcomeScreen = () => {
         <TouchableOpacity style={{ marginTop: 15, backgroundColor: COLORS.brown, padding: 15, borderRadius: 30, paddingHorizontal: 40 }} onPress={Press}>
           <Text style={{ color: COLORS.white, fontWeight: 'bold' }}>Obter Direção</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity>
+            <Text style={{ color: COLORS.grey, marginTop: 8, textDecorationLine: 'underline' }} onPress={goToSignIn}>Ou faça login</Text>
+          </TouchableOpacity>
+        
         {showLoginText && (
           <TouchableOpacity>
             <Text style={{ color: COLORS.grey, marginTop: 8, textDecorationLine: 'underline' }} onPress={goToSignIn}>Ou faça login</Text>
