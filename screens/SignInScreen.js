@@ -15,6 +15,14 @@ const SignInScreen = () => {
 
   const navigation = useNavigation();
 
+  const goToSignIn = () => {
+    navigation.navigate('SignInScreen')
+  }
+
+  const goToCreateAccountScreen = () => {
+    navigation.navigate('createAccountScreen')
+  }
+
   const handleSignUp = async () => {
     try {
       const userCredentials = await auth.createUserWithEmailAndPassword(email, password);
@@ -97,7 +105,7 @@ const SignInScreen = () => {
           <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
             <Text style={styles.buttonText} >Login</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.registerButton} onPress={handleSignUp}>
+          <TouchableOpacity style={styles.registerButton} onPress={goToCreateAccountScreen}>
             <Text style={styles.buttonRe}>Criar conta</Text>
           </TouchableOpacity>
         </View>

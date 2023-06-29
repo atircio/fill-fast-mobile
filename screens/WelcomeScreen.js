@@ -51,9 +51,7 @@ const WelcomeScreen = () => {
           <Text style={{ color: COLORS.white, fontWeight: 'bold' }}>Obter Direção</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity>
-            <Text style={{ color: COLORS.grey, marginTop: 8, textDecorationLine: 'underline' }} onPress={goToSignIn}>Ou faça login</Text>
-          </TouchableOpacity>
+       
         
         {showLoginText && (
           <TouchableOpacity>
