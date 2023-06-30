@@ -154,10 +154,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   profileImage: {
-    width: 120,
-    height: 120,
+    width: 100,
+    height: 100,
     borderRadius: 60,
-    marginRight: 20,
+    marginRight: 5,
   },
   email: {
     fontSize: 18,
