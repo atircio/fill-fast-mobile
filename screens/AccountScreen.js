@@ -10,8 +10,6 @@ import { LoginCredentialData } from '../database/LoginCredential';
 import NotAuthorized from './NotAuthorized';
 import Swiper from 'react-native-swiper';
 
-
-
 const AccountScreen = () => {
   const [user, setUser] = useState(null);
   const navigation = useNavigation();
@@ -19,8 +17,17 @@ const AccountScreen = () => {
   useEffect(() => {
     const fetchUser = async () => {
       const existingUser = await getUser();
-      console.log(LoginCredentialData)
-      setUser(existingUser);
+      if (existingUser && existingUser.email) {
+        const userSnapshot = await db.collection('users').where('email', '==', existingUser.email).get();
+        if (!userSnapshot.empty) {
+          const userData = userSnapshot.docs[0].data();
+          setUser({ ...existingUser, name: userData.name });
+        } else {
+          setUser(existingUser);
+        }
+      } else {
+        setUser(existingUser);
+      }
     };
 
     fetchUser();
@@ -36,7 +43,7 @@ const AccountScreen = () => {
 
   const handleLogout = async () => {
     try {
-      await auth.signOut(); // Sign out from Firebase
+      await auth.signOut(); 
       await AsyncStorage.removeItem('user');
       LoginCredentialData.splice(0, LoginCredentialData.length);
       Alert.alert('Está sendo redirecionado para a tela principal') // Remove user data from AsyncStorage
@@ -47,18 +54,18 @@ const AccountScreen = () => {
     }
   };
 
-  const handleWhatsApp = () => {
-    Linking.openURL('whatsapp://send?text=Olá!&phone=SEU_NUMERO');
-  };
 
-  const handleEmail = () => {
-    Linking.openURL('mailto:SEU_EMAIL');
-  };
 
-  const handleLinkedIn = () => {
-    Linking.openURL('SEU_PERFIL_LINKEDIN');
+  const handlePasswordReset = async () => {
+    try {
+      await auth.sendPasswordResetEmail(email);
+      Alert.alert('E-mail de recuperação de senha enviado com sucesso!');
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Erro ao enviar o e-mail de recuperação de senha.');
+    }
   };
-
+  
   const userWithEmail = LoginCredentialData.find((item) => item && item.email);
   const result = userWithEmail || null;
 
@@ -68,7 +75,7 @@ const AccountScreen = () => {
       <View style={styles.container}>
         <View style={styles.profileContainer}>
           <Image source={require('../assets/profile-pic.png')} style={styles.profileImage} />
-          <Text style={styles.email}>{user ? user.email : 'Faça Login'}</Text>
+          <Text style={styles.email}>{user ? user.name : 'Faça Login'}</Text>
         </View>
 
         <View style={styles.separator} />
@@ -91,27 +98,33 @@ const AccountScreen = () => {
           </TouchableOpacity>
         </View>
 
+        <TouchableOpacity style={styles.option} onPress={handlePasswordReset}>
+          <AntDesign name="unlock" size={24} color="black" />
+          <Text style={styles.optionText}>Recuperar Senha</Text>
+        </TouchableOpacity>
+
+
         <Swiper
           style={styles.swiperContainer}
           autoplay
-          autoplayTimeout={1000}GPS 
+          autoplayTimeout={1000} GPS
           loop
         >
-            <Image source={require('../assets/gps.gif')} style={{ width: 100, height: 100 }} />
+          <Image source={require('../assets/gps.gif')} style={{ width: 100, height: 100 }} />
         </Swiper>
 
         {/* Contact buttons */}
         <View style={styles.contactContainer}>
-          <TouchableOpacity style={styles.contactButton} onPress={handleWhatsApp}>
+          <TouchableOpacity style={styles.contactButton} onPress={''}>
             <FontAwesome5 name="whatsapp" size={24} color={COLORS.black} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.contactButton} onPress={handleEmail}>
+          <TouchableOpacity style={styles.contactButton} onPress={''}>
             <FontAwesome5 name="envelope" size={24} color={COLORS.black} />
-            
+
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.contactButton} onPress={handleLinkedIn}>
+          <TouchableOpacity style={styles.contactButton} onPress={''}>
             <FontAwesome5 name="linkedin" size={24} color={COLORS.black} />
           </TouchableOpacity>
         </View>
