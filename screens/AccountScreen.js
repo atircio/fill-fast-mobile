@@ -91,7 +91,7 @@ const AccountScreen = () => {
 
         <TouchableOpacity style={styles.option} onPress={handlePasswordReset}>
           <AntDesign name="unlock" size={24} color="black" />
-          <Text style={styles.optionText}>Recuperar Senha</Text>
+          <Text style={styles.optionText}>Alterar Senha</Text>
         </TouchableOpacity>
 
 
