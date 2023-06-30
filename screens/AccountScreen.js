@@ -17,17 +17,8 @@ const AccountScreen = () => {
   useEffect(() => {
     const fetchUser = async () => {
       const existingUser = await getUser();
-      if (existingUser && existingUser.email) {
-        const userSnapshot = await db.collection('users').where('email', '==', existingUser.email).get();
-        if (!userSnapshot.empty) {
-          const userData = userSnapshot.docs[0].data();
-          setUser({ ...existingUser, name: userData.name });
-        } else {
-          setUser(existingUser);
-        }
-      } else {
-        setUser(existingUser);
-      }
+      console.log(LoginCredentialData)
+      setUser(existingUser);
     };
 
     fetchUser();
@@ -58,7 +49,7 @@ const AccountScreen = () => {
 
   const handlePasswordReset = async () => {
     try {
-      await auth.sendPasswordResetEmail(email);
+      await auth.sendPasswordResetEmail(user.email);
       Alert.alert('E-mail de recuperação de senha enviado com sucesso!');
     } catch (error) {
       console.log(error);
@@ -75,7 +66,7 @@ const AccountScreen = () => {
       <View style={styles.container}>
         <View style={styles.profileContainer}>
           <Image source={require('../assets/profile-pic.png')} style={styles.profileImage} />
-          <Text style={styles.email}>{user ? user.name : 'Faça Login'}</Text>
+          <Text style={styles.email}>{user ? user.email : 'Faça Login'}</Text>
         </View>
 
         <View style={styles.separator} />
