@@ -4,7 +4,7 @@ import MapScreen from './screens/MapScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {decode, encode} from 'base-64'
+import { decode, encode } from 'base-64'
 
 
 import MapView from 'react-native-maps';
@@ -19,8 +19,9 @@ import NotAuthorized from './screens/NotAuthorized';
 import { COLORS } from './src/theme/theme';
 import AlertsBuild from './screens/AlertsBuild';
 import AlertsList from './screens/AlertsList';
+import createAccountScreen from './screens/createAccountScreen';
 
-if (!global.btoa) {  global.btoa = encode }
+if (!global.btoa) { global.btoa = encode }
 
 if (!global.atob) { global.atob = decode }
 
@@ -32,7 +33,7 @@ export default function App() {
 
     <NavigationContainer>
       <SafeAreaView style={styles.container}>
-        <Stack.Navigator initialRouteName='AlertsBuild'>
+        <Stack.Navigator initialRouteName='SplashScreen'>
           <Stack.Screen
             name="SplashScreen"
             component={SplashScreen}
@@ -57,6 +58,14 @@ export default function App() {
           <Stack.Screen
             name="SignInScreen"
             component={SignInScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+
+          <Stack.Screen
+            name="createAccountScreen"
+            component={createAccountScreen}
             options={{
               headerShown: false,
             }}
@@ -110,7 +119,7 @@ export default function App() {
               headerShown: false,
             }}
           />
-          
+
         </Stack.Navigator>
       </SafeAreaView>
     </NavigationContainer>
@@ -121,7 +130,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.bg,
-textAlign:'center'
+    textAlign: 'center'
   },
   map: {
     width: '100%',
