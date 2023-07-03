@@ -19,6 +19,9 @@ import NotAuthorized from './screens/NotAuthorized';
 import { COLORS } from './src/theme/theme';
 import AlertsBuild from './screens/AlertsBuild';
 import AlertsList from './screens/AlertsList';
+import Ab from './screens/Ab';
+import CommentsScreen from './screens/CommentsScreen';
+
 
 if (!global.btoa) {  global.btoa = encode }
 
@@ -32,7 +35,7 @@ export default function App() {
 
     <NavigationContainer>
       <SafeAreaView style={styles.container}>
-        <Stack.Navigator initialRouteName='AlertsBuild'>
+        <Stack.Navigator initialRouteName='WelcomeScreen'>
           <Stack.Screen
             name="SplashScreen"
             component={SplashScreen}
@@ -62,8 +65,22 @@ export default function App() {
             }}
           />
           <Stack.Screen
+            name="CommentsScreen"
+            component={CommentsScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
             name="NotAuthorized"
             component={NotAuthorized}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="Ab"
+            component={Ab}
             options={{
               headerShown: false,
             }}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Image, Modal , TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import { AntDesign, Ionicons, FontAwesome5, Feather } from '@expo/vector-icons';
 import { COLORS } from '../src/theme/theme';
 import { useNavigation } from '@react-navigation/native';
@@ -7,10 +7,17 @@ import { useNavigation } from '@react-navigation/native';
 const PaScreen = ({ route }) => {
   const { id, name, rating, reviews, imageReference, address, latitude2, longitude2 } = route.params;
   const API_KEY = 'YOUR_API_KEY';
+  const [isPopupVisible, setPopupVisible] = useState(false);
+
   const [imageError, setImageError] = useState(false);
   const handleImageError = () => {
     setImageError(true);
   };
+
+  const togglePopup = () => {
+    setPopupVisible(!isPopupVisible);
+  };
+  
 
   const fuels = [
     {
@@ -41,6 +48,12 @@ const PaScreen = ({ route }) => {
     });
   };
 
+  const goToAvaliar = () => {
+    navigation.navigate('CommentsScreen', {
+      place_id: id,
+    });
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={{ width: '100%' }}>
@@ -66,7 +79,7 @@ const PaScreen = ({ route }) => {
                 <Text style={{ color: COLORS.dark, marginLeft: 8 }}>({reviews})</Text>
               </View>
             </View>
-            <TouchableOpacity style={styles.favPa}>
+            <TouchableOpacity style={styles.favPa} onPress={goToAvaliar}>
               <AntDesign name="like2" style={styles.likeIcon} />
             </TouchableOpacity>
           </View>
@@ -105,7 +118,6 @@ const PaScreen = ({ route }) => {
             <Text style={{ color: COLORS.grey, marginTop: 1, fontSize: 18 }}>Preço</Text>
             <Text style={{ marginTop: 2, color: COLORS.dark, fontWeight: '700' }}>160 kz/l</Text>
           </View>
-
           <FlatList
             horizontal={true}
             data={fuels}
