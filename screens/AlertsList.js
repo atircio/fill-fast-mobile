@@ -18,7 +18,7 @@ const AlertsList = ({ route }) => {
       const { carID } = route.params;
       setIdCar(carID);
       console.log(carID)
-      getVehiclesByUserID(carID)
+      getAlertsByCarID(carID)
       }
 
   }, [route]);
@@ -31,16 +31,13 @@ const AlertsList = ({ route }) => {
   const userWithEmail = LoginCredentialData.find((item) => item && item.uid);
   const result = userWithEmail || null;
 
-  const goToVehicleBuild = ({ item }) => {
-    navigation.navigate('VehicleBuild', {
-      carID: item.id,
+  const goToAlertBuild = () => {
+    navigation.navigate('AlertsBuild', {
+      carID: IdCar,
       uid: result.uid
     });
   };
 
-  const goToVehicleBuildEmpty = () => {
-    navigation.navigate('VehicleBuild');
-  };
 
   const [data, setData] = useState([]);
   const [imageError, setImageError] = useState(false);
@@ -49,7 +46,7 @@ const AlertsList = ({ route }) => {
     setImageError(true);
   };
 
-  const getVehiclesByUserID = async (carID) => {
+  const getAlertsByCarID = async (carID) => {
     try {
       const querySnapshot = await db
         .collection('users')
@@ -73,32 +70,27 @@ const AlertsList = ({ route }) => {
     }
   };
 
-  useEffect(() => {
-    if (result) {
-      getVehiclesByUserID();
-    }
-  }, [result]);
+ 
 
-  const deleteVehicle = async (vehicleId) => {
+  const deleteAlert = async (id) => {
     try {
       await db
         .collection('users')
         .doc(result.uid)
         .collection('veiculos')
-        .doc(vehicleId)
-        .delete();
-
+        .doc(IdCar)
+        .collection('alerts').doc(id).delete()
       // Refresh the data after deletion
-      getVehiclesByUserID();
+      getAlertsByCarID();
     } catch (error) {
       console.error('Erro ao eliminar veículo: ', error);
     }
   };
 
-  const confirmDeleteVehicle = (item) => {
+  const confirmDeleteAlert = (item) => {
     Alert.alert(
       'Eliminar Lembrete',
-      `Deseja eliminar o veículo ${item.name}?`,
+      `Deseja eliminar o lembrete ${item.title}?`,
       [
         {
           text: 'Cancelar',
@@ -106,7 +98,7 @@ const AlertsList = ({ route }) => {
         },
         {
           text: 'Sim',
-          onPress: () => deleteVehicle(item.id),
+          onPress: () => deleteAlert(item.id),
         },
       ],
       { cancelable: false }
@@ -114,7 +106,7 @@ const AlertsList = ({ route }) => {
   };
 
   const renderListItem = ({ item }) => (
-    <TouchableOpacity onPress={() => goToVehicleBuild({ item })} onLongPress={() => confirmDeleteVehicle(item)}>
+    <TouchableOpacity onLongPress={() => confirmDeleteAlert(item)}>
       <View style={styles.item}>
         <Image
           source={
@@ -129,9 +121,6 @@ const AlertsList = ({ route }) => {
           <Text style={styles.itemTitle}>{item.title}</Text>
           <Text style={styles.itemDescription}>Modificado à: {getElapsedTimeFromUTC(item.createdAt)}</Text>
         </View>
-        <TouchableOpacity style={styles.itemButton} onPress={() => goToVehicleBuild({ item })}>
-          <AntDesign name="arrowright" size={16} color="white" />
-        </TouchableOpacity>
       </View>
     </TouchableOpacity>
   );
@@ -141,8 +130,7 @@ const AlertsList = ({ route }) => {
       <View style={{ backgroundColor: COLORS.bg, height: '100%' }}>
         <View style={styles.container}>
           <View style={{ alignItems: 'center', marginTop: 40 }}>
-            <Image source={require('../assets/CarS.gif')} style={{ width: 200, height: 200 }} />
-            <Text style={styles.title}>Configure os seus veículos</Text>
+            <Text style={styles.title}>Lembretes</Text>
           </View>
           <FlatList
             data={data.slice().sort((a, b) => b.createdAt - a.createdAt)}
@@ -150,7 +138,7 @@ const AlertsList = ({ route }) => {
             keyExtractor={(item) => item.id}
           />
         </View>
-        <TouchableOpacity style={styles.floatingButton} onPress={goToVehicleBuildEmpty}>
+        <TouchableOpacity style={styles.floatingButton} onPress={goToAlertBuild}>
           <AntDesign name="plus" size={24} color="white" />
         </TouchableOpacity>
       </View>

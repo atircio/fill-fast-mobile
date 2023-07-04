@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import * as Notifications from 'expo-notifications';
+import moment from 'moment';
+
 import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { COLORS } from '../src/theme/theme';
@@ -8,7 +11,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useNavigation } from '@react-navigation/native';
 import { db, auth, storage, firebase } from '../firebase';
 import { LoginCredentialData } from '../database/LoginCredential';
-import carDefault from '../assets/carDefault.png'
+import carDefault from '../assets/carDefault.png';
 
 const AlertsBuild = ({ route }) => {
   const [service, setService] = useState('');
@@ -31,12 +34,25 @@ const AlertsBuild = ({ route }) => {
   };
 
   useEffect(() => {
+    const subscription = Notifications.addNotificationReceivedListener(handleNotification);
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
+  const handleNotification = (notification) => {
+    // Aqui você pode tratar a notificação recebida, se necessário
+    console.log(notification);
+  };
+  
+
+
+  useEffect(() => {
     if (route.params) {
       const { carID } = route.params;
       setIdCar(carID);
       console.log(carID)
-      //fetchData(carID);  
-      }
+    }
 
   }, [route]);
 
@@ -86,36 +102,33 @@ const AlertsBuild = ({ route }) => {
   };
 
   const saveDataToFirestore = async () => {
-    
-  
     try {
       setIsLoading(true); // Show the loading indicator
-  
+
       // Autenticar o usuário atual
       const userWithEmail = LoginCredentialData.find((item) => item && item.email);
       const currentUserID = userWithEmail ? userWithEmail.uid : null;
-  
+
       if (!currentUserID) {
         setIsLoading(false); // Hide the loading indicator
         Alert.alert('Erro: Usuário não autenticado');
         return;
       }
-  
 
       const currentUTC = firebase.firestore.Timestamp.now();
-  
-      // Criar um ID único para o veículo
-      const alertsRed = db
+
+      // Criar um ID único para o lembrete
+      const alertRef = db
         .collection('users')
         .doc(currentUserID)
         .collection('veiculos')
-        .doc('BoeWoV8KUTBdKcipLmyO')
+        .doc(IdCar)
         .collection('alerts')
         .doc();
-  
-      // Salvar informações do veículo no documento do usuário
-      await alertsRed.set({
-        id: alertsRed.id,
+
+      // Salvar informações do lembrete no documento do usuário
+      await alertRef.set({
+        id: alertRef.id,
         service,
         title,
         note,
@@ -123,23 +136,73 @@ const AlertsBuild = ({ route }) => {
         startDate,
         startTime,
         repeatOption,
-        createdAt: currentUTC
+        createdAt: currentUTC,
       });
-  
+
+      // Criar a notificação com base no lembrete
+      if (repetition === 'unico' && startDate && startTime) {
+        const fireDateTime = moment(`${startDate}T${startTime}`).toDate();
+        console.log("fireDateTime: "+fireDateTime)
+
+        console.log("data: "+startDate)
+        console.log("tempo: "+startTime)
+
+        const trigger = fireDateTime.getTime() - Date.now();
+        console.log("trigger: "+trigger)
+
+        if (trigger > 0) {
+          console.log("hbjkbjnhkhjkbj")
+          // Agendar a notificação para o tempo especificado
+          await Notifications.scheduleNotificationAsync({
+            content: {
+              title: 'Lembrete',
+              body: title,
+              data: { lembreteId: alertRef.id },
+            },
+            trigger: { seconds: Math.floor(trigger / 1000) },
+          });
+        }
+      } else if (repetition === 'repetir' && startDate && startTime && repeatOption) {
+        const repeatOptions = {
+          diariamente: { repeats: true, every: 86400 },
+          semanalmente: { repeats: true, every: 604800 },
+          mensalmente: { repeats: true, every: 2592000 },
+        };
+
+        const fireDateTime = new Date(`${startDate} ${startTime}`);
+
+        // Agendar a notificação para o tempo especificado, com base na opção de repetição selecionada
+        await Notifications.scheduleNotificationAsync({
+          content: {
+            title: 'Lembrete',
+            body: title,
+            data: { lembreteId: alertRef.id },
+          },
+          trigger: {
+            seconds: Math.floor((fireDateTime.getTime() - Date.now()) / 1000),
+            repeats: repeatOptions[repeatOption].repeats,
+            every: repeatOptions[repeatOption].every,
+          },
+        }).then((notificationId) => {
+          console.log('Notificação agendada com sucesso. ID da notificação:', notificationId);
+        })
+        .catch((error) => {
+          console.log('Erro ao agendar notificação:', error);
+        });;
+      }
+      console.log("dgbdfghfhf")
       setIsLoading(false); // Hide the loading indicator
-      Alert.alert('Dados salvos com sucesso!');
-      backScreen();
+      Alert.alert('Lembrete salvo com sucesso');
     } catch (error) {
       setIsLoading(false); // Hide the loading indicator
-      Alert.alert('Erro ao salvar os dados: ', error.message);
-      backScreen();
-
+      Alert.alert('Erro ao salvar o lembrete', error.message);
     }
   };
 
 
+
   if (route.params) {
-    if (isLoading) {
+    if (!isLoading) {
       return (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
@@ -150,6 +213,7 @@ const AlertsBuild = ({ route }) => {
     return (
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.inputContainer}>
+          <Text> </Text>
           <AntDesign name="bars" size={24} color={COLORS.primary} style={styles.icon} />
           <Picker
             style={styles.input}
@@ -295,153 +359,7 @@ const AlertsBuild = ({ route }) => {
       </ScrollView>
     );
   }
-  return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.inputContainer}>
-        <AntDesign name="bars" size={24} color={COLORS.primary} style={styles.icon} />
-        <Picker
-          style={styles.input}
-          selectedValue={service}
-          onValueChange={(itemValue) => setService(itemValue)}
-        >
-          <Picker.Item label="Serviço" value="servico" />
-          <Picker.Item label="Manutenção" value="manutencao" />
-          <Picker.Item label="Estacionamento" value="estacionamento" />
-          <Picker.Item label="Lavagem" value="lavagem" />
-          <Picker.Item label="Portagens" value="portagens" />
-          <Picker.Item label="Multas" value="multas" />
-          <Picker.Item label="Tuning" value="tuning" />
-          <Picker.Item label="Seguro" value="seguro" />
-          <Picker.Item label="Taxa" value="taxa" />
-          <Picker.Item label="Documento" value="documento" />
-        </Picker>
-      </View>
-      <View style={styles.inputContainer}>
-        <AntDesign name="filetext1" size={24} color={COLORS.primary} style={styles.icon} />
-        <TextInput
-          style={styles.input}
-          placeholder="Título do serviço"
-          value={title}
-          onChangeText={(text) => setTitle(text)}
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <AntDesign name="filetext1" size={24} color={COLORS.primary} style={styles.icon} />
-        <TextInput
-          style={styles.input}
-          placeholder="Nota adicional"
-          value={note}
-          onChangeText={(text) => setNote(text)}
-        />
-      </View>
-      <Text style={styles.title}>Repetições</Text>
-      <View style={styles.radioContainer}>
-        <View style={styles.radioButtonContainer}>
-          <RadioButton
-            value="unico"
-            status={repetition === 'unico' ? 'checked' : 'unchecked'}
-            onPress={() => setRepetition('unico')}
-            color={COLORS.primary}
-          />
-          <Text style={styles.radioButtonLabel}>Único</Text>
-        </View>
-        <View style={styles.radioButtonContainer}>
-          <RadioButton
-            value="repetir"
-            status={repetition === 'repetir' ? 'checked' : 'unchecked'}
-            onPress={() => setRepetition('repetir')}
-            color={COLORS.primary}
-          />
-          <Text style={styles.radioButtonLabel}>Repetir a cada</Text>
-        </View>
-      </View>
 
-      {repetition === 'unico' && (
-        <View>
-          <View style={styles.inputContainer}>
-            <AntDesign name="calendar" size={24} color={COLORS.primary} style={styles.icon} />
-            <TextInput
-              style={styles.input}
-              placeholder="Data (DD/MM/AAAA)"
-              value={startDate}
-              onChangeText={(text) => setStartDate(text)}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <AntDesign name="clockcircleo" size={24} color={COLORS.primary} style={styles.icon} />
-            <TextInput
-              style={styles.input}
-              placeholder="Hora (HH:MM)"
-              value={startTime}
-              onChangeText={(text) => setStartTime(text)}
-            />
-          </View>
-        </View>
-      )}
-
-      {repetition === 'repetir' && (
-        <View>
-          <View style={styles.inputContainer}>
-            <AntDesign name="calendar" size={24} color={COLORS.primary} style={styles.icon} />
-            <TextInput
-              style={styles.input}
-              placeholder="Data de início (DD/MM/AAAA)"
-              value={startDate}
-              onChangeText={(text) => setStartDate(text)}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <AntDesign name="clockcircleo" size={24} color={COLORS.primary} style={styles.icon} />
-            <TextInput
-              style={styles.input}
-              placeholder="Hora de início (HH:MM)"
-              value={startTime}
-              onChangeText={(text) => setStartTime(text)}
-            />
-          </View>
-          <Text style={styles.title}>Repetir:</Text>
-          <View style={styles.radioContainer}>
-            <View style={styles.radioButtonContainer}>
-              <RadioButton
-                value="diariamente"
-                status={repeatOption === 'diariamente' ? 'checked' : 'unchecked'}
-                onPress={() => setRepeatOption('diariamente')}
-                color={COLORS.primary}
-              />
-              <Text style={styles.radioButtonLabel}>Diariamente</Text>
-            </View>
-            <View style={styles.radioButtonContainer}>
-              <RadioButton
-                value="semanalmente"
-                status={repeatOption === 'semanalmente' ? 'checked' : 'unchecked'}
-                onPress={() => setRepeatOption('semanalmente')}
-                color={COLORS.primary}
-              />
-              <Text style={styles.radioButtonLabel}>Semanalmente</Text>
-            </View>
-            <View style={styles.radioButtonContainer}>
-              <RadioButton
-                value="mensalmente"
-                status={repeatOption === 'mensalmente' ? 'checked' : 'unchecked'}
-                onPress={() => setRepeatOption('mensalmente')}
-                color={COLORS.primary}
-              />
-              <Text style={styles.radioButtonLabel}>Mensalmente</Text>
-            </View>
-          </View>
-        </View>
-      )}
-
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.saveButton} onPress={saveDataToFirestore}>
-          <Text style={styles.saveButtonText}>Salvar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.cancelButton} onPress={backScreen}>
-          <Text style={styles.cancelButtonText}>Cancelar</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
-  );
 };
 
 const styles = StyleSheet.create({
@@ -515,7 +433,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cancelButtonText: {
-    color:  COLORS.gold,
+    color: COLORS.gold,
     fontWeight: 'bold',
   },
   loadingContainer: {
