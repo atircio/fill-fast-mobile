@@ -20,7 +20,7 @@ const SignInScreen = () => {
   }
 
   const goToCreateAccountScreen = () => {
-    navigation.navigate('createAccountScreen')
+    navigation.navigate('Create')
   }
 
   const handleSignUp = async () => {

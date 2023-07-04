@@ -9,7 +9,7 @@ import { CurrentUser, checkAsyncStorageData, getUser } from '../database/Databas
 import { LoginCredentialData } from '../database/LoginCredential';
 
 
-const CreateAccountScreen = () => {
+const Create = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -126,7 +126,7 @@ const CreateAccountScreen = () => {
     );
 };
 
-export default CreateAccountScreen;
+export default Create;
 
 const styles = StyleSheet.create({
     continueWithGoogle: {

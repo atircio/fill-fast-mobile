@@ -23,7 +23,7 @@ const PaScreen = ({ route }) => {
     {
       id: "1",
       name: "Gasolina",
-      price: "160"
+      price: "300"
     },
     {
       id: "2",
