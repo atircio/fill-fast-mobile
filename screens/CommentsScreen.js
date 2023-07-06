@@ -39,7 +39,7 @@ const CommentsScreen = ({ route }) => {
 
       const currentUTC = firebase.firestore.Timestamp.now();
 
-      const ref = db.collection('comments').doc();
+      const ref = db.collection('comments').doc(place_id);
 
       await ref.set({
         id: ref.id,
@@ -136,18 +136,26 @@ const CommentsScreen = ({ route }) => {
     <View style={styles.container}>
       <Text style={styles.title}>Avaliações do Posto</Text>
       <Image source={require('../assets/imgDefaultGas.jpg')} style={styles.image} />
-      {data.length === 0 ? (
-        <View style={styles.noCommentsContainer}>
-          <Text style={styles.noCommentsText}>Sem comentários</Text>
+      {data.length === 0 && !loading ? (
+  <View style={styles.noCommentsContainer}>
+    <Text style={styles.noCommentsText}>Sem comentários</Text>
+  </View>
+) : (
+  <FlatList
+    data={data}
+    renderItem={renderCommentItem}
+    keyExtractor={(item) => item.id}
+    contentContainerStyle={styles.flatListContainer}
+    ListEmptyComponent={
+      loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
-      ) : (
-        <FlatList
-          data={data}
-          renderItem={renderCommentItem}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.flatListContainer}
-        />
-      )}
+      ) : null
+    }
+  />
+)}
+
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={[styles.button, styles.cancelButton]}>
           <Text

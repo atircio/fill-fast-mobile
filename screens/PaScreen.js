@@ -116,7 +116,7 @@ const PaScreen = ({ route }) => {
           <View style={{ marginTop: 20, marginBottom: 20 }}>
             <Text style={{ color: COLORS.grey }}>Combustiveis</Text>
             <Text style={{ color: COLORS.grey, marginTop: 1, fontSize: 18 }}>Preço</Text>
-            <Text style={{ marginTop: 2, color: COLORS.dark, fontWeight: '700' }}>160 kz/l</Text>
+            <Text style={{ marginTop: 2, color: COLORS.dark, fontWeight: '700' }}>300 kz/l</Text>
           </View>
           <FlatList
             horizontal={true}

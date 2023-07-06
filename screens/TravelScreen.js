@@ -4,6 +4,8 @@ import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import { requestForegroundPermissionsAsync, getCurrentPositionAsync, watchPositionAsync } from 'expo-location';
 import MapViewDirections from 'react-native-maps-directions';
 import { COLORS } from '../src/theme/theme';
+import imagePath from '../src/constants/imagePath';
+
 
 const TravelScreen = ({ route }) => {
   const { lat, lon } = route.params;
@@ -14,6 +16,9 @@ const TravelScreen = ({ route }) => {
   const [distance, setDistance] = useState('');
   const [duration, setDuration] = useState('');
   const [directions, setDirections] = useState(null);
+
+  const [currentLocation, setCurrentLocation] = useState(null);
+
 
   useEffect(() => {
     const getPermission = async () => {
@@ -40,7 +45,7 @@ const TravelScreen = ({ route }) => {
       const positionWatcher = await watchPositionAsync(
         {
           accuracy: 6,
-          timeInterval: 1000,
+          timeInterval: 10000,
           distanceInterval: 10,
         },
         (newLocation) => {
@@ -58,7 +63,7 @@ const TravelScreen = ({ route }) => {
     if (location) {
       watchUserPosition();
     }
-  }, [location]);
+  }, []);
 
   useEffect(() => {
     if (location) {
@@ -89,6 +94,17 @@ const TravelScreen = ({ route }) => {
                 apikey={YOUR_GOOGLE_MAPS_API_KEY}
                 strokeWidth={4}
                 strokeColor="hotpink"
+                optimizeWaypoints={true}
+                onReady={result => {
+                  mapRef.current.fitToCoordinates(result.coordinates, {
+                    edgePadding: {
+                      bottom: 300,
+                      right:30,
+                      letf: 30,
+                      top:100
+                    }
+                  })
+                }}
               />
             );
             setDirections(directions);
@@ -112,6 +128,7 @@ const TravelScreen = ({ route }) => {
           latitudeDelta: 0.005,
           longitudeDelta: 0.005,
         }}
+        
       >
         {location && (
           <Marker
@@ -120,6 +137,7 @@ const TravelScreen = ({ route }) => {
               longitude: location.coords.longitude,
             }}
             title="Minha Localização"
+
           />
         )}
         {directions && directions}
@@ -152,6 +170,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 5,
+  },
+  carMarker: {
+    width: 1, // Defina a largura desejada
+    height: 1, // Defina a altura desejada
   },
 });
 
