@@ -39,8 +39,6 @@ const MapScreenFooter = () => {
   useEffect(() => {
     const radius = 200000; // 5km em metros
 
-
-
     if (location) {
       const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.coords.latitude},${location.coords.longitude}&radius=${radius}&type=gas_station&key=${API_KEY}`;
       console.log(url)

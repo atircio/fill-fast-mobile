@@ -24,12 +24,6 @@ const AccountScreen = () => {
     fetchUser();
   }, []);
 
-  /*useEffect(() => {
-    if (!user || Object.keys(user).length === 0) {
-      console.log(user);
-      navigation.replace('NotAuthorized');
-    }
-  }, [user, navigation]);*/
 
 
   const handleLogout = async () => {
@@ -37,11 +31,10 @@ const AccountScreen = () => {
       await auth.signOut(); 
       await AsyncStorage.removeItem('user');
       LoginCredentialData.splice(0, LoginCredentialData.length);
-      Alert.alert('Está sendo redirecionado para a tela principal') // Remove user data from AsyncStorage
-      navigation.replace('WelcomeScreen'); // Navigate back to the login or desired screen
+      Alert.alert('Está sendo redirecionado para a tela principal') 
+      navigation.replace('WelcomeScreen'); 
     } catch (error) {
       console.error('Error logging out:', error);
-      // Handle logout error if necessary
     }
   };
 
@@ -91,7 +84,7 @@ const AccountScreen = () => {
 
         <TouchableOpacity style={styles.option} onPress={handlePasswordReset}>
           <AntDesign name="unlock" size={24} color="black" />
-          <Text style={styles.optionText}>Recuperar Senha</Text>
+          <Text style={styles.optionText}>Alterar Senha</Text>
         </TouchableOpacity>
 
 
@@ -154,10 +147,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   profileImage: {
-    width: 120,
-    height: 120,
+    width: 100,
+    height: 100,
     borderRadius: 60,
-    marginRight: 20,
+    marginRight: 5,
   },
   email: {
     fontSize: 18,
