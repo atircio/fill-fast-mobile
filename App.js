@@ -4,12 +4,13 @@ import MapScreen from './screens/MapScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { decode, encode } from 'base-64'
+import {decode, encode} from 'base-64'
 
 
 import MapView from 'react-native-maps';
 import SplashScreen from './screens/SplashScreen';
 import Tab from './screens/Tab';
+import CreateAccountScreen from './screens/AccountScreen';
 import PaScreen from './screens/PaScreen';
 import WelcomeScreen from './screens/WelcomeScreen';
 import SignInScreen from './screens/SignInScreen';
@@ -19,9 +20,11 @@ import NotAuthorized from './screens/NotAuthorized';
 import { COLORS } from './src/theme/theme';
 import AlertsBuild from './screens/AlertsBuild';
 import AlertsList from './screens/AlertsList';
-import createAccountScreen from './screens/createAccountScreen';
+//import Ab from './screens/Ab';
+import CommentsScreen from './screens/CommentsScreen';
 
-if (!global.btoa) { global.btoa = encode }
+
+if (!global.btoa) {  global.btoa = encode }
 
 if (!global.atob) { global.atob = decode }
 
@@ -33,7 +36,7 @@ export default function App() {
 
     <NavigationContainer>
       <SafeAreaView style={styles.container}>
-        <Stack.Navigator initialRouteName='SplashScreen'>
+        <Stack.Navigator initialRouteName='WelcomeScreen'>
           <Stack.Screen
             name="SplashScreen"
             component={SplashScreen}
@@ -62,10 +65,9 @@ export default function App() {
               headerShown: false,
             }}
           />
-
           <Stack.Screen
-            name="createAccountScreen"
-            component={createAccountScreen}
+            name="CommentsScreen"
+            component={CommentsScreen}
             options={{
               headerShown: false,
             }}
@@ -77,6 +79,7 @@ export default function App() {
               headerShown: false,
             }}
           />
+          
           <Stack.Screen
             name="VehicleBuild"
             component={VehicleBuild}
@@ -112,6 +115,13 @@ export default function App() {
               headerShown: false,
             }}
           />
+            <Stack.Screen
+            name="CreateAccountScreen"
+            component={CreateAccountScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
           <Stack.Screen
             name="Tab"
             component={Tab}
@@ -119,7 +129,7 @@ export default function App() {
               headerShown: false,
             }}
           />
-
+          
         </Stack.Navigator>
       </SafeAreaView>
     </NavigationContainer>
@@ -130,7 +140,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.bg,
-    textAlign: 'center'
+textAlign:'center'
   },
   map: {
     width: '100%',

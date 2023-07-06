@@ -7,70 +7,64 @@ import { auth, db } from '../firebase';
 import User from '../modules/mobileUser';
 import { CurrentUser, checkAsyncStorageData, getUser } from '../database/Database';
 import { LoginCredentialData } from '../database/LoginCredential';
-
 const SignInScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
 
   const navigation = useNavigation();
 
   const goToSignIn = () => {
-    navigation.navigate('SignInScreen')
-  }
+    navigation.navigate('SignInScreen');
+  };
 
   const goToCreateAccountScreen = () => {
-    navigation.navigate('createAccountScreen')
-  }
+    navigation.navigate('createAccountScreen');
+  };
 
   const handleSignUp = async () => {
     try {
+      // Criar a conta de usuário
       const userCredentials = await auth.createUserWithEmailAndPassword(email, password);
       const user = userCredentials.user;
-  
-      console.log('Registered with:', user.email);
-  
-      const userInstance = new CurrentUser();
-      await userInstance.insertUser(user);
-  
-      const retrievedUser = await getUser();
-      LoginCredentialData.push(await retrievedUser);
-  
-      const userID = user.uid; // Obtém o ID do usuário
 
-      await db.collection('users').doc(userID).set({
-        email: user.email
-        // Outras informações adicionais do usuário
-      });
-  
+      console.log('Registered with:', user.email);
+
       // Sucesso na criação da conta
       Alert.alert('Conta de usuário criada com sucesso!');
-  
+
       navigation.replace('Tab');
     } catch (error) {
       alert(error.message);
     }
   };
-  
-  
 
   const handleLogin = async () => {
-    console.log("*****************************************");
     try {
+      // Fazer o login do usuário
       const userCredentials = await auth.signInWithEmailAndPassword(email, password);
       const user = userCredentials.user;
 
-      const userInstance = new CurrentUser();
-      await userInstance.insertUser(user);
+      console.log('Logged in with:', user.email);
 
-      const retrievedUser = await getUser();
-      LoginCredentialData.push(await retrievedUser);
+      navigation.replace('Tab');
     } catch (error) {
       console.log(error);
       alert(error.message);
-    } finally {
-      setLoading(false);
-      navigation.replace('Tab');
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    try {
+      // Enviar e-mail de recuperação de senha
+      if (email) {
+        await auth.sendPasswordResetEmail(email);
+        Alert.alert('E-mail de recuperação de senha enviado com sucesso!');
+      } else {
+        Alert.alert('Por favor, insira um e-mail válido.');
+      }
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Erro ao enviar o e-mail de recuperação de senha.');
     }
   };
 
@@ -97,7 +91,7 @@ const SignInScreen = () => {
             onChangeText={text => setPassword(text)}
           />
         </View>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handlePasswordReset}>
           <Text style={styles.forgotPassword}>Esqueceu a senha?</Text>
         </TouchableOpacity>
         <View style={styles.separator} />
