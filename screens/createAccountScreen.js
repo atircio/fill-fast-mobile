@@ -8,14 +8,13 @@ import User from '../modules/mobileUser';
 import { CurrentUser, checkAsyncStorageData, getUser } from '../database/Database';
 import { LoginCredentialData } from '../database/LoginCredential';
 
-
 const CreateAccountScreen = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [nome, setName] = useState('');
     const [loading, setLoading] = useState(false);
-  
+    
     const navigation = useNavigation();
   
     const handleSignUp = async () => {
@@ -29,7 +28,7 @@ const CreateAccountScreen = () => {
         const userCredentials = await auth.createUserWithEmailAndPassword(email, password);
         const user = userCredentials.user;
   
-        console.log('Registered with:', user.email+user.name);
+        console.log('Registered with:', user.email + user.name);
   
         const userInstance = new CurrentUser();
         await userInstance.insertUser(user);
@@ -45,7 +44,13 @@ const CreateAccountScreen = () => {
           // Outras informações adicionais do usuário
         });
   
-        Alert.alert('Conta de usuário criada com sucesso!');
+        // Envie o e-mail de verificação
+        await user.sendEmailVerification();
+  
+        Alert.alert(
+          'Criação de Conta',
+          'Um e-mail de verificação foi enviado para o endereço fornecido. Por favor, verifique seu e-mail para confirmar a criação da conta.',
+        );
   
         navigation.replace('Tab');
       } catch (error) {
@@ -57,72 +62,70 @@ const CreateAccountScreen = () => {
     };
   
     const goToSignScreen = () => {
-      navigation.navigate('SignInScreen')
+      navigation.navigate('SignInScreen');
     }
-
-    
-
+  
 
 
 
     return (
         <ScrollView>
             <View style={{ backgroundColor: COLORS.bg, height: '100%' }}>
-            <View style={{ alignItems: 'center', marginTop: 40 }}>
-                <Image
-                    source={require('../assets/Signup.gif')}
-                    style={{ width: 90, height: 90, backgroundColor: 'transparent' }}
-                />
+                <View style={{ alignItems: 'center', marginTop: 40 }}>
+                    <Image
+                        source={require('../assets/Signup.gif')}
+                        style={{ width: 90, height: 90, backgroundColor: 'transparent' }}
+                    />
+                </View>
+                <View style={{ paddingHorizontal: 20 }}>
+                    <View style={{ marginTop: 40 }}>
+                        <Text style={styles.loginMessage}>Crie uma conta na FillFast para melhor experiência</Text>
+
+                        <TextInput
+                            placeholder="Digite o Nome"
+                            style={styles.input}
+                            onChangeText={text => setName(text.trim())}
+                        />
+
+
+
+                        <TextInput
+                            placeholder="Email"
+                            style={styles.input}
+                            onChangeText={text => setEmail(text.trim())}
+                        />
+                    </View>
+                    <View style={{ marginTop: 20 }}>
+                        <TextInput
+                            placeholder="Palavra-passe"
+                            secureTextEntry={true}
+                            style={styles.input}
+                            onChangeText={text => setPassword(text)}
+                        />
+                    </View>
+
+                    <View style={{ marginTop: 20 }}>
+                        <TextInput
+                            placeholder="Repita a palavra-passe"
+                            secureTextEntry={true}
+                            style={styles.input}
+                            onChangeText={text => setConfirmPassword(text)}
+                        />
+                    </View>
+
+                    <View style={styles.separator} />
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity style={styles.loginButton} onPress={goToSignScreen}>
+                            <Text style={styles.buttonText}>Login</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.registerButton} onPress={handleSignUp}>
+                            <Text style={styles.buttonRe}>Criar conta</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
             </View>
-            <View style={{ paddingHorizontal: 20 }}>
-                <View style={{ marginTop: 40 }}>
-                    <Text style={styles.loginMessage}>Crie uma conta na FillFast para melhor experiência</Text>
-
-                    <TextInput
-                        placeholder="Digite o Nome"
-                        style={styles.input}
-                        onChangeText={text => setName(text.trim())}
-                    />
-
-
-
-                    <TextInput
-                        placeholder="Email"
-                        style={styles.input}
-                        onChangeText={text => setEmail(text.trim())}
-                    />
-                </View>
-                <View style={{ marginTop: 20 }}>
-                    <TextInput
-                        placeholder="Palavra-passe"
-                        secureTextEntry={true}
-                        style={styles.input}
-                        onChangeText={text => setPassword(text)}
-                    />
-                </View>
-
-                <View style={{ marginTop: 20 }}>
-                    <TextInput
-                        placeholder="Repita a palavra-passe"
-                        secureTextEntry={true}
-                        style={styles.input}
-                        onChangeText={text => setConfirmPassword(text)}
-                    />
-                </View>
-
-                <View style={styles.separator} />
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={styles.loginButton} onPress={goToSignScreen}>
-                        <Text style={styles.buttonText}>Login</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.registerButton} onPress={handleSignUp}>
-                        <Text style={styles.buttonRe}>Criar conta</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-        </View>
         </ScrollView>
-        
+
     );
 };
 
