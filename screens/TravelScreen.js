@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import { requestForegroundPermissionsAsync, getCurrentPositionAsync, watchPositionAsync } from 'expo-location';
 import MapViewDirections from 'react-native-maps-directions';
+import { MaterialCommunityIcons } from 'react-native-vector-icons';
 import { COLORS } from '../src/theme/theme';
 import imagePath from '../src/constants/imagePath';
 
@@ -116,6 +117,19 @@ const TravelScreen = ({ route }) => {
     }
   }, [location]);
 
+  const handleButtonPress = () => {
+    if (mapRef.current) {
+      const { latitude, longitude } = location.coords;
+      mapRef.current.animateToRegion({
+        latitude,
+        longitude,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      });
+    }
+  };
+
+  //**************** */
   return (
     <View style={styles.container}>
       <MapView
@@ -137,11 +151,24 @@ const TravelScreen = ({ route }) => {
               longitude: location.coords.longitude,
             }}
             title="Minha Localização"
-
+            image={imagePath.CurLoc}
           />
         )}
         {directions && directions}
       </MapView>
+      <TouchableOpacity
+        style={styles.buttonContainer}
+        onPress={handleButtonPress}
+      >
+        <View style={styles.button}>
+          <MaterialCommunityIcons
+            name="navigation-variant"
+            size={24}
+            color="red"
+          />
+        </View>
+      </TouchableOpacity>
+
       <View style={styles.infoContainer}>
         <Text style={styles.infoText}>Distância: {distance}</Text>
         <Text style={styles.infoText}>Tempo Restante: {duration}</Text>
@@ -174,6 +201,17 @@ const styles = StyleSheet.create({
   carMarker: {
     width: 1, // Defina a largura desejada
     height: 1, // Defina a altura desejada
+  },
+  buttonContainer: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+  },
+  button: {
+    backgroundColor: 'white',
+    borderRadius: 30,
+    padding: 10,
+    elevation: 5,
   },
 });
 
