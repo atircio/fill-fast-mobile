@@ -6,8 +6,9 @@ import { COLORS } from '../src/theme/theme';
 import { LocationAccuracy, getCurrentPositionAsync, requestForegroundPermissionsAsync, watchPositionAsync } from 'expo-location';
 import MapViewDirections from 'react-native-maps-directions';
 import { useNavigation } from '@react-navigation/native';
+import {API_KEY} from '@env'
 
-const API_KEY = 'AIzaSyAt9UZDa-5DO4Kav_aRyyA1kOB83NEz0xY';
+
 
 
 const MapScreenFooter = () => {

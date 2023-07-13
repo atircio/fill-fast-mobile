@@ -23,6 +23,14 @@ const AlertsList = ({ route }) => {
 
   }, [route]);
 
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      getAlertsByCarID(); // Fetch the updated vehicle list
+    });
+  
+    return unsubscribe;
+  }, [navigation]);
+
 
   const Press = () => {
     navigation.replace('Tab');

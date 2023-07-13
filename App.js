@@ -22,6 +22,7 @@ import AlertsList from './screens/AlertsList';
 import Ab from './screens/Ab';
 import CommentsScreen from './screens/CommentsScreen';
 import Create from './screens/Create';
+import FuelCalculatorScreen from './screens/FuelCalculatorScreen';
 
 
 if (!global.btoa) {  global.btoa = encode }
@@ -54,6 +55,13 @@ export default function App() {
           <Stack.Screen
             name="PaScreen"
             component={PaScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="FuelCalculatorScreen"
+            component={FuelCalculatorScreen}
             options={{
               headerShown: false,
             }}

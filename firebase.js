@@ -7,6 +7,8 @@ import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
 import 'firebase/compat/firestore'
 import 'firebase/compat/storage';
+import {API_KEY, MEASUREMENTID, APPID, MESSAGINGSENDERID, STORAGEBUCKET, PROJECTID, AUTHDOMAIN} from '@env'
+
 
 
 // TODO: Add SDKs for Firebase products that you want to use

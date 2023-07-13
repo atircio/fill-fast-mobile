@@ -10,6 +10,7 @@ import { LoginCredentialData } from '../database/LoginCredential';
 import carDefault from '../assets/carDefault.png'
 
 const VehicleBuild = ({ route }) => {
+  const navigation = useNavigation();
   const [imageUri, setImageUri] = useState(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -27,7 +28,6 @@ const VehicleBuild = ({ route }) => {
 
 
 
-  const navigation = useNavigation();
 
   const backScreen = () => {
     navigation.goBack();
@@ -35,6 +35,8 @@ const VehicleBuild = ({ route }) => {
   const backToFirstScreen = () => {
     navigation.navigate('Veiculo', { screen: 'VehicleBuild' });
   };
+
+  
 
   useEffect(() => {
     if (route.params) {
@@ -241,7 +243,14 @@ const VehicleBuild = ({ route }) => {
     }
   };
   
-  
+  const setNameValid = (value) => {
+    console.log("gh.")
+    if ((/^[a-zA-Z\s]*$/.match(value))) {
+      setName(value);
+    } else {
+      Alert.alert('Erro de validação', 'Não é possível inserir caracteres especiais no nome.');
+    }
+  };
   
   if (route.params) {
 
@@ -268,7 +277,7 @@ const VehicleBuild = ({ route }) => {
           <TextInput
             placeholder="Nome"
             style={styles.input}
-            onChangeText={setName}
+            onChangeText={setNameValid}
             value={name}
           />
           <TextInput

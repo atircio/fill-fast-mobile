@@ -6,12 +6,13 @@ import MapViewDirections from 'react-native-maps-directions';
 import { MaterialCommunityIcons } from 'react-native-vector-icons';
 import { COLORS } from '../src/theme/theme';
 import imagePath from '../src/constants/imagePath';
+import {API_KEY} from '@env'
 
 
 const TravelScreen = ({ route }) => {
   const { lat, lon } = route.params;
 
-  const YOUR_GOOGLE_MAPS_API_KEY = 'AIzaSyAt9UZDa-5DO4Kav_aRyyA1kOB83NEz0xY';
+  const YOUR_GOOGLE_MAPS_API_KEY = API_KEY;
   const mapRef = useRef(null);
   const [location, setLocation] = useState(null);
   const [distance, setDistance] = useState('');

@@ -39,7 +39,7 @@ const CommentsScreen = ({ route }) => {
 
       const currentUTC = firebase.firestore.Timestamp.now();
 
-      const ref = db.collection('comments').doc(place_id);
+      const ref = db.collection('comments').doc(place_id).collection('dataComments').doc();
 
       await ref.set({
         id: ref.id,
@@ -51,6 +51,7 @@ const CommentsScreen = ({ route }) => {
 
       Alert.alert('Dados salvos com sucesso!');
       closeCommentModal();
+      getComments()
     } catch (error) {
       Alert.alert('Erro ao salvar os dados: ', error.message);
       closeCommentModal();
@@ -59,24 +60,33 @@ const CommentsScreen = ({ route }) => {
 
   const getComments = async () => {
     try {
-      const querySnapshot = await db.collection('comments').get();
-
+      const querySnapshot = await db.collection('comments').doc(place_id).collection('dataComments').get();
+      
+     /* if (!querySnapshot.exists) {
+        console.log("hjwsbhj")
+        setData([]);
+        setLoading(false);
+        return;
+      }*/
+  
       const aux = [];
-
-      querySnapshot.forEach(async (doc) => {
+  
+      await Promise.all(querySnapshot.docs.map(async (doc) => {
         const commentData = doc.data();
         const userSnapshot = await db.collection('users').doc(commentData.currentUserID).get();
         const userData = userSnapshot.data();
         aux.push({ ...commentData, userData });
-      });
-
+      }));
+  
       setData(aux);
-      setLoading(false); // Set loading to false after data is fetched
+      setLoading(false); // Define loading como false após os dados serem buscados
     } catch (error) {
       console.error('Error getting comments: ', error);
-      setLoading(false); // Set loading to false on error as well
+      setLoading(false); // Define loading como false também em caso de erro
     }
   };
+  
+  
 
   const renderCommentItem = ({ item }) => {
     if (!item) {
@@ -86,7 +96,7 @@ const CommentsScreen = ({ route }) => {
         </View>
       );
     }
-  
+
     return (
       <TouchableOpacity>
         <View style={styles.commentItemContainer}>
@@ -110,7 +120,7 @@ const CommentsScreen = ({ route }) => {
       </TouchableOpacity>
     );
   };
-  
+
 
   const openCommentModal = () => {
     setShowModal(true);
@@ -137,24 +147,24 @@ const CommentsScreen = ({ route }) => {
       <Text style={styles.title}>Avaliações do Posto</Text>
       <Image source={require('../assets/imgDefaultGas.jpg')} style={styles.image} />
       {data.length === 0 && !loading ? (
-  <View style={styles.noCommentsContainer}>
-    <Text style={styles.noCommentsText}>Sem comentários</Text>
-  </View>
-) : (
-  <FlatList
-    data={data}
-    renderItem={renderCommentItem}
-    keyExtractor={(item) => item.id}
-    contentContainerStyle={styles.flatListContainer}
-    ListEmptyComponent={
-      loading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
+        <View style={styles.noCommentsContainer}>
+          <Text style={styles.noCommentsText}>Sem comentários</Text>
         </View>
-      ) : null
-    }
-  />
-)}
+      ) : (
+        <FlatList
+          data={data}
+          renderItem={renderCommentItem}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.flatListContainer}
+          ListEmptyComponent={
+            loading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color={COLORS.primary} />
+              </View>
+            ) : null
+          }
+        />
+      )}
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={[styles.button, styles.cancelButton]}>

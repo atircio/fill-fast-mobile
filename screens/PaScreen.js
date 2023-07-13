@@ -7,31 +7,24 @@ import { useNavigation } from '@react-navigation/native';
 const PaScreen = ({ route }) => {
   const { id, name, rating, reviews, imageReference, address, latitude2, longitude2, opened } = route.params;
   const API_KEY = 'YOUR_API_KEY';
-  const [isPopupVisible, setPopupVisible] = useState(false);
 
+  const [isPopupVisible, setPopupVisible] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+
   const handleImageError = () => {
     setImageError(true);
   };
-
   const togglePopup = () => {
     setPopupVisible(!isPopupVisible);
   };
-
-  const [selectedItem, setSelectedItem] = useState(null);
-
-  // Função para mostrar as informações detalhadas do item selecionado
   const showItemDetails = (item) => {
     setSelectedItem(item);
     setPopupVisible(true);
   };
-
-  // Função para fechar o modal
   const closeItemDetails = () => {
     setPopupVisible(false);
   };
-
-
   const fuels = [
     {
       id: "1",
@@ -54,7 +47,6 @@ const PaScreen = ({ route }) => {
       details: "***"
     }
   ];
-
   const navigation = useNavigation();
 
   const pressToTravel = () => {
