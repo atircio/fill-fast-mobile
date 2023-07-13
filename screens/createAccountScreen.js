@@ -3,10 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { COLORS } from '../src/theme/theme';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { auth, db } from '../firebase';
 import User from '../modules/mobileUser';
 import { CurrentUser, checkAsyncStorageData, getUser } from '../database/Database';
 import { LoginCredentialData } from '../database/LoginCredential';
+import { auth, db } from '../firebase';
 
 
 const CreateAccountScreen = () => {
@@ -20,7 +20,7 @@ const CreateAccountScreen = () => {
   
     const handleSignUp = async () => {
       if (password !== confirmPassword) {
-        Alert.alert('Erro', 'As senhas não coincidem.');
+        Alert.alert('Erro', 'As senhas não coincidem repita.');
         return;
       }
   
@@ -29,8 +29,11 @@ const CreateAccountScreen = () => {
         const userCredentials = await auth.createUserWithEmailAndPassword(email, password);
         const user = userCredentials.user;
   
-        console.log('Registered with:', user.email+user.name);
-  
+        //console.log('Registered with:', user.email+user.name);
+         user.sendEmailVerification();
+
+        console.log('Registered with:', user.email + user.name);
+
         const userInstance = new CurrentUser();
         await userInstance.insertUser(user);
   
@@ -45,7 +48,7 @@ const CreateAccountScreen = () => {
           // Outras informações adicionais do usuário
         });
   
-        Alert.alert('Conta de usuário criada com sucesso!');
+        Alert.alert('Conta de usuário criada com sucesso na Fill Fast!');
   
         navigation.replace('Tab');
       } catch (error) {

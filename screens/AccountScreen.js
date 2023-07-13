@@ -27,6 +27,7 @@ const AccountScreen = () => {
     fetchUser();
   }, []);
 
+<<<<<<< HEAD
   useEffect(() => {
     const userWithEmail = LoginCredentialData.find((item) => item && item.uid);
     const currentUserID = userWithEmail ? userWithEmail.uid : null;
@@ -54,6 +55,24 @@ const AccountScreen = () => {
     }
   };
 
+=======
+  const handleSendEmailVerification = async () => {
+    try {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        await currentUser.sendEmailVerification();
+        Alert.alert('Email de verificação enviado com sucesso!');
+      } else {
+        Alert.alert('Erro', 'Não foi possível encontrar o usuário atual.');
+      }
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Erro ao enviar o email de verificação.');
+    }
+  };
+  
+  
+>>>>>>> teste
 
   const handleLogout = async () => {
     try {
@@ -100,7 +119,7 @@ const AccountScreen = () => {
             <Text style={styles.optionText}>Postos Favoritos</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.option}>
+          <TouchableOpacity style={styles.option} >
             <FontAwesome5 name="cog" size={24} color="black" />
             <Text style={styles.optionText}>Definições</Text>
           </TouchableOpacity>
@@ -123,30 +142,8 @@ const AccountScreen = () => {
         </TouchableOpacity>
 
 
-        <Swiper
-          style={styles.swiperContainer}
-          autoplay
-          autoplayTimeout={1000} GPS
-          loop
-        >
-          <Image source={require('../assets/gps.gif')} style={{ width: 100, height: 100 }} />
-        </Swiper>
-
-        {/* Contact buttons */}
-        <View style={styles.contactContainer}>
-          <TouchableOpacity style={styles.contactButton} onPress={''}>
-            <FontAwesome5 name="whatsapp" size={24} color={COLORS.black} />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.contactButton} onPress={''}>
-            <FontAwesome5 name="envelope" size={24} color={COLORS.black} />
-
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.contactButton} onPress={''}>
-            <FontAwesome5 name="linkedin" size={24} color={COLORS.black} />
-          </TouchableOpacity>
-        </View>
+       
+       
       </View>
 
     );

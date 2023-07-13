@@ -19,42 +19,46 @@ const Create = () => {
     const navigation = useNavigation();
   
     const handleSignUp = async () => {
-      if (password !== confirmPassword) {
-        Alert.alert('Erro', 'As senhas não coincidem.');
-        return;
-      }
-  
-      try {
-        setLoading(true);
-        const userCredentials = await auth.createUserWithEmailAndPassword(email, password);
-        const user = userCredentials.user;
-  
-        console.log('Registered with:', user.email+user.name);
-  
-        const userInstance = new CurrentUser();
-        await userInstance.insertUser(user);
-  
-        const retrievedUser = await getUser();
-        LoginCredentialData.push(await retrievedUser);
-  
-        const userID = user.uid;
-  
-        await db.collection('users').doc(userID).set({
-          name: nome,
-          email: user.email
-          // Outras informações adicionais do usuário
-        });
-  
-        Alert.alert('Conta de usuário criada com sucesso!');
-  
-        navigation.replace('Tab');
-      } catch (error) {
-        console.log(error);
-        Alert.alert('Erro', error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+        if (password !== confirmPassword) {
+          Alert.alert('Erro', 'As senhas não coincidem.');
+          return;
+        }
+      
+        try {
+          setLoading(true);
+          const userCredentials = await auth.createUserWithEmailAndPassword(email, password);
+          const user = userCredentials.user;
+      
+          await user.sendEmailVerification();
+          Alert.alert('Sucesso', 'Um email de verificação foi enviado para o seu endereço de email.');
+      
+          console.log('Registrado com:', user.email + user.name);
+      
+          // Insira o usuário no banco de dados
+          const userInstance = new CurrentUser();
+          await userInstance.insertUser(user);
+      
+          const retrievedUser = await getUser();
+          LoginCredentialData.push(await retrievedUser);
+      
+          const userID = user.uid;
+      
+          await db.collection('users').doc(userID).set({
+            name: nome,
+            email: user.email
+            // Outras informações adicionais do usuário
+          });
+      
+          navigation.replace('SignInScreen', { email: user.email, password });
+      
+        } catch (error) {
+          console.log(error);
+          Alert.alert('Erro', error.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+      
   
     const goToSignScreen = () => {
       navigation.navigate('SignInScreen')

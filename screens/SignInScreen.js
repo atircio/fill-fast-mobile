@@ -53,27 +53,34 @@ const SignInScreen = () => {
   };
   
   
-
   const handleLogin = async () => {
-    console.log("*****************************************");
     try {
+      setLoading(true);
       const userCredentials = await auth.signInWithEmailAndPassword(email, password);
       const user = userCredentials.user;
-
+  
+      // Verificar se o email do usuário foi verificado
+      if (!user.emailVerified) {
+        Alert.alert('Erro', 'Seu email ainda não foi verificado. Verifique seu email antes de fazer login.');
+        setLoading(false);
+        return;
+      }
+  
       const userInstance = new CurrentUser();
       await userInstance.insertUser(user);
-
+  
       const retrievedUser = await getUser();
       LoginCredentialData.push(await retrievedUser);
-    } catch (error) {
-      console.log(error);
-      alert(error.message);
-    } finally {
+  
       setLoading(false);
       navigation.replace('Tab');
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Erro', error.message);
+      setLoading(false);
     }
   };
-
+  
   return (
     <View style={{ backgroundColor: COLORS.bg, height: '100%' }}>
       <View style={{ alignItems: 'center', marginTop: 40 }}>
