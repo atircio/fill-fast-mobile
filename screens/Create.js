@@ -34,7 +34,7 @@ const Create = () => {
       
           console.log('Registrado com:', user.email + user.name);
       
-          // Insira o usuário no banco de dados
+        
           const userInstance = new CurrentUser();
           await userInstance.insertUser(user);
       
