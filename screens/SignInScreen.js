@@ -23,6 +23,9 @@ const SignInScreen = () => {
     navigation.navigate('Create')
   }
 
+  
+  
+
   const handleSignUp = async () => {
     try {
       const userCredentials = await auth.createUserWithEmailAndPassword(email, password);
@@ -51,6 +54,43 @@ const SignInScreen = () => {
       alert(error.message);
     }
   };
+
+  const handlePasswordReset = async () => {
+    // Verificar se o email foi preenchido
+    if (!email) {
+      Alert.alert('Erro', 'Por favor, digite seu email para redefinir a senha.');
+      return;
+    }
+  
+    try {
+      // Verificar se o email está cadastrado no Firebase
+      const user = await fetchUserByEmail(email);
+  
+      if (user) {
+        // Enviar o email de recuperação de senha
+        await auth.sendPasswordResetEmail(email);
+        Alert.alert('E-mail de recuperação de senha enviado com sucesso!');
+      } else {
+        Alert.alert('Erro', 'Não foi encontrada nenhuma conta com esse email.');
+      }
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Erro ao enviar o e-mail de recuperação de senha.');
+    }
+  };
+  
+  const fetchUserByEmail = async (email) => {
+    try {
+      const snapshot = await db.collection('users').where('email', '==', email).get();
+      if (snapshot.empty) {
+        return null; // Nenhum usuário encontrado com o email fornecido
+      }
+      return snapshot.docs[0].data(); // Retorna os dados do primeiro usuário encontrado
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  };
   
   
   const handleLogin = async () => {
@@ -61,8 +101,27 @@ const SignInScreen = () => {
   
       // Verificar se o email do usuário foi verificado
       if (!user.emailVerified) {
-        Alert.alert('Erro', 'Seu email ainda não foi verificado. Verifique seu email antes de fazer login.');
-        setLoading(false);
+        Alert.alert(
+          'Erro',
+          'Seu email ainda não foi verificado. Verifique seu email antes de fazer login.',
+          [
+            {
+              text: 'Reenviar email de verificação',
+              onPress: () => {
+                user.sendEmailVerification().then(() => {
+                  Alert.alert('Sucesso', 'Um novo email de verificação foi enviado para o seu endereço de email.');
+                }).catch((error) => {
+                  Alert.alert('Erro', 'Ocorreu um erro ao reenviar o email de verificação. Tente novamente mais tarde.');
+                });
+              },
+            },
+            {
+              text: 'Cancelar',
+              style: 'cancel',
+              onPress: () => setLoading(false),
+            },
+          ],
+        );
         return;
       }
   
@@ -80,6 +139,7 @@ const SignInScreen = () => {
       setLoading(false);
     }
   };
+  
   
   return (
     <View style={{ backgroundColor: COLORS.bg, height: '100%' }}>
@@ -104,8 +164,8 @@ const SignInScreen = () => {
             onChangeText={text => setPassword(text)}
           />
         </View>
-        <TouchableOpacity>
-          <Text style={styles.forgotPassword}>Esqueceu a senha?</Text>
+        <TouchableOpacity onPress={handlePasswordReset}>
+          <Text style={styles.forgotPassword}>Esqueceu a senha? </Text>
         </TouchableOpacity>
         <View style={styles.separator} />
         <View style={styles.buttonContainer}>
