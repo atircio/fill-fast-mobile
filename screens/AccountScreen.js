@@ -27,7 +27,6 @@ const AccountScreen = () => {
     fetchUser();
   }, []);
 
-<<<<<<< HEAD
   useEffect(() => {
     const userWithEmail = LoginCredentialData.find((item) => item && item.uid);
     const currentUserID = userWithEmail ? userWithEmail.uid : null;
@@ -55,7 +54,6 @@ const AccountScreen = () => {
     }
   };
 
-=======
   const handleSendEmailVerification = async () => {
     try {
       const currentUser = auth.currentUser;
@@ -72,7 +70,6 @@ const AccountScreen = () => {
   };
   
   
->>>>>>> teste
 
   const handleLogout = async () => {
     try {
