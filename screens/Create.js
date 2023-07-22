@@ -19,6 +19,16 @@ const Create = () => {
     const navigation = useNavigation();
   
     const handleSignUp = async () => {
+    
+        const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+        if (!strongPasswordRegex.test(password)) {
+          Alert.alert(
+            'Erro',
+            'A senha deve ter no mínimo 8 caracteres e conter pelo menos 1 letra maiúscula, 1 letra minúscula e 1 número.'
+          );
+          return;
+        }
+      
         if (password !== confirmPassword) {
           Alert.alert('Erro', 'As senhas não coincidem.');
           return;
@@ -29,12 +39,15 @@ const Create = () => {
           const userCredentials = await auth.createUserWithEmailAndPassword(email, password);
           const user = userCredentials.user;
       
+          
+          auth.languageCode = 'pt';
+          auth.useDeviceLanguage();
+      
           await user.sendEmailVerification();
           Alert.alert('Sucesso', 'Um email de verificação foi enviado para o seu endereço de email.');
       
           console.log('Registrado com:', user.email + user.name);
       
-        
           const userInstance = new CurrentUser();
           await userInstance.insertUser(user);
       
@@ -46,18 +59,26 @@ const Create = () => {
           await db.collection('users').doc(userID).set({
             name: nome,
             email: user.email
-            // Outras informações adicionais do usuário
+           
           });
       
           navigation.replace('SignInScreen', { email: user.email, password });
-      
         } catch (error) {
           console.log(error);
-          Alert.alert('Erro', error.message);
+      
+     
+          if (error.code === 'auth/email-already-in-use') {
+            Alert.alert('Erro', 'O email fornecido já está em uso. Tente fazer login ou use um email diferente.');
+          } else if (error.code === 'auth/invalid-email') {
+            Alert.alert('Erro', 'O email fornecido é inválido. Verifique o formato do email digitado.');
+          } else {
+            Alert.alert('Erro', error.message);
+          }
         } finally {
           setLoading(false);
         }
       };
+      
       
   
     const goToSignScreen = () => {

@@ -39,14 +39,13 @@ const SignInScreen = () => {
       const retrievedUser = await getUser();
       LoginCredentialData.push(await retrievedUser);
   
-      const userID = user.uid; // Obtém o ID do usuário
+      const userID = user.uid; 
 
       await db.collection('users').doc(userID).set({
         email: user.email
-        // Outras informações adicionais do usuário
+       
       });
   
-      // Sucesso na criação da conta
       Alert.alert('Conta de usuário criada com sucesso!');
   
       navigation.replace('Tab');
@@ -56,18 +55,18 @@ const SignInScreen = () => {
   };
 
   const handlePasswordReset = async () => {
-    // Verificar se o email foi preenchido
+  
     if (!email) {
       Alert.alert('Erro', 'Por favor, digite seu email para redefinir a senha.');
       return;
     }
   
     try {
-      // Verificar se o email está cadastrado no Firebase
+   
       const user = await fetchUserByEmail(email);
   
       if (user) {
-        // Enviar o email de recuperação de senha
+   
         await auth.sendPasswordResetEmail(email);
         Alert.alert('E-mail de recuperação de senha enviado com sucesso!');
       } else {
@@ -83,9 +82,9 @@ const SignInScreen = () => {
     try {
       const snapshot = await db.collection('users').where('email', '==', email).get();
       if (snapshot.empty) {
-        return null; // Nenhum usuário encontrado com o email fornecido
+        return null; 
       }
-      return snapshot.docs[0].data(); // Retorna os dados do primeiro usuário encontrado
+      return snapshot.docs[0].data(); 
     } catch (error) {
       console.log(error);
       throw error;
@@ -99,7 +98,7 @@ const SignInScreen = () => {
       const userCredentials = await auth.signInWithEmailAndPassword(email, password);
       const user = userCredentials.user;
   
-      // Verificar se o email do usuário foi verificado
+     
       if (!user.emailVerified) {
         Alert.alert(
           'Erro',
@@ -135,7 +134,17 @@ const SignInScreen = () => {
       navigation.replace('Tab');
     } catch (error) {
       console.log(error);
-      Alert.alert('Erro', error.message);
+   
+   if (error.code === 'auth/user-not-found') {
+   
+    Alert.alert('Erro', 'O e-mail fornecido não está associado a uma conta. Verifique o e-mail digitado ou crie uma nova conta.');
+  } else if (error.code === 'auth/wrong-password') {
+    
+    Alert.alert('Erro', 'Senha incorreta. Verifique a senha digitada e tente novamente.');
+  } else {
+   
+    Alert.alert('Erro', error.message);
+  }
       setLoading(false);
     }
   };
