@@ -9,7 +9,7 @@ import { auth } from '../firebase';
 import { LoginCredentialData } from '../database/LoginCredential';
 import NotAuthorized from './NotAuthorized';
 import Swiper from 'react-native-swiper';
-import { db } from '../firebase'; // Import the Firestore database instance
+import { db } from '../firebase'; 
 
 
 const AccountScreen = () => {

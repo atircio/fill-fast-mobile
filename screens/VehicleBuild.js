@@ -31,8 +31,8 @@ const VehicleBuild = ({ route }) => {
   const [year, setYear] = useState("");
   const [licensePlate, setLicensePlate] = useState("");
 
-  const [data, setData] = useState([]); // Initialize data with an empty array
-  const [isLoading, setIsLoading] = useState(true); // Adiciona a variável isLoading
+  const [data, setData] = useState([]); 
+  const [isLoading, setIsLoading] = useState(true);
 
   const [IdCar, setIdCar] = useState(null);
 
@@ -79,7 +79,6 @@ const VehicleBuild = ({ route }) => {
       setIsLoading(false);
       console.log(vehicleData);
 
-      // Preencher Inputs com os dados do objeto data
       setName(vehicleData.name);
       setDescription(vehicleData.description);
       setFuelType(vehicleData.fuelType);
@@ -126,9 +125,9 @@ const VehicleBuild = ({ route }) => {
     }
 
     try {
-      setIsLoading(true); // Show the loading indicator
+      setIsLoading(true);
 
-      // Verifica se o campo "name" contém apenas letras e, no máximo, um espaço em branco consecutivo
+     
       const nameRegex = /^[a-zA-Z]+(\s[a-zA-Z]+)*$/;
       if (!nameRegex.test(name)) {
         Alert.alert(
@@ -138,7 +137,7 @@ const VehicleBuild = ({ route }) => {
         return;
       }
 
-      // Verifica se o campo "description" contém apenas letras e, no máximo, um espaço em branco consecutivo
+   
       const descriptionRegex = /^[a-zA-Z]+(\s[a-zA-Z]+)*$/;
       if (description && !descriptionRegex.test(description)) {
         Alert.alert(
@@ -148,7 +147,7 @@ const VehicleBuild = ({ route }) => {
         return;
       }
 
-      // Verifica se o campo "brand" contém apenas letras e, no máximo, um espaço em branco consecutivo
+      
       const brandRegex = /^[a-zA-Z]+(\s[a-zA-Z]+)*$/;
       if (brand && !brandRegex.test(brand)) {
         Alert.alert(
@@ -158,7 +157,6 @@ const VehicleBuild = ({ route }) => {
         return;
       }
 
-      // Verifica se o campo "model" contém apenas letras e, no máximo, um espaço em branco consecutivo
       const modelRegex = /^[a-zA-Z]+(\s[a-zA-Z]+)*$/;
       if (model && !modelRegex.test(model)) {
         Alert.alert(
@@ -177,7 +175,7 @@ const VehicleBuild = ({ route }) => {
         return;
       }
 
-      // Verifica se o campo "licensePlate" contém apenas letras maiúsculas, números e o caractere "-"
+      
       const licensePlateRegex = /^[A-Z0-9-]+$/;
       if (licensePlate && !licensePlateRegex.test(licensePlate)) {
         Alert.alert(
@@ -187,14 +185,14 @@ const VehicleBuild = ({ route }) => {
         return;
       }
 
-      // Autenticar o usuário atual
+
       const userWithEmail = LoginCredentialData.find(
         (item) => item && item.email
       );
       const currentUserID = userWithEmail ? userWithEmail.uid : null;
 
       if (!currentUserID) {
-        setIsLoading(false); // Hide the loading indicator
+        setIsLoading(false); 
         Alert.alert("Erro: Usuário não autenticado");
         return;
       }
@@ -202,29 +200,29 @@ const VehicleBuild = ({ route }) => {
       let imageURL = "";
 
       if (imageUri) {
-        // Salvar a imagem no Firebase Storage
-        const imageFileName = `${currentUserID}_${name}.jpg`; // Nome do arquivo com base no ID do usuário e no nome do veículo
+       
+        const imageFileName = `${currentUserID}_${name}.jpg`;
         const response = await fetch(imageUri);
         const blob = await response.blob();
         const storageRef = storage.ref().child(imageFileName);
         await storageRef.put(blob);
 
-        // Obter a URL da imagem salva no Firebase Storage
+        
         imageURL = await storageRef.getDownloadURL();
       }
 
       const currentUTC = firebase.firestore.Timestamp.now();
 
-      // Criar um ID único para o veículo
+      
       const vehicleDocRef = db
         .collection("users")
         .doc(currentUserID)
         .collection("veiculos")
         .doc();
 
-      // Salvar informações do veículo no documento do usuário
+    
       await vehicleDocRef.set({
-        id: vehicleDocRef.id, // Salvar o ID único do veículo
+        id: vehicleDocRef.id, 
         name,
         description,
         fuelType,
@@ -237,11 +235,11 @@ const VehicleBuild = ({ route }) => {
         createdAt: currentUTC,
       });
 
-      setIsLoading(false); // Hide the loading indicator
+      setIsLoading(false);
       Alert.alert("Dados salvos com sucesso!");
       backToFirstScreen();
     } catch (error) {
-      setIsLoading(false); // Hide the loading indicator
+      setIsLoading(false); 
       Alert.alert("Erro ao salvar os dados: ", error.message);
       backToFirstScreen();
     }
@@ -249,16 +247,16 @@ const VehicleBuild = ({ route }) => {
 
   const updateDataInFirestore = async () => {
     try {
-      setIsLoading(true); // Show the loading indicator
+      setIsLoading(true); 
 
-      // Autenticar o usuário atual
+    
       const userWithEmail = LoginCredentialData.find(
         (item) => item && item.email
       );
       const currentUserID = userWithEmail ? userWithEmail.uid : null;
 
       if (!currentUserID) {
-        setIsLoading(false); // Hide the loading indicator
+        setIsLoading(false); 
         Alert.alert("Erro: Usuário não autenticado");
         return;
       }
@@ -272,14 +270,14 @@ const VehicleBuild = ({ route }) => {
       let imageURL = "";
 
       if (imageUri) {
-        // Salvar a imagem no Firebase Storage
-        const imageFileName = `${currentUserID}_${name}.jpg`; // Nome do arquivo com base no ID do usuário e no nome do veículo
+        
+        const imageFileName = `${currentUserID}_${name}.jpg`; 
         const response = await fetch(imageUri);
         const blob = await response.blob();
         const storageRef = storage.ref().child(imageFileName);
         await storageRef.put(blob);
 
-        // Obter a URL da imagem salva no Firebase Storage
+        
         imageURL = await storageRef.getDownloadURL();
       }
 
@@ -298,11 +296,11 @@ const VehicleBuild = ({ route }) => {
 
       await vehicleDocRef.update(data);
 
-      setIsLoading(false); // Hide the loading indicator
+      setIsLoading(false); 
       Alert.alert("Dados atualizados com sucesso!");
       backToFirstScreen();
     } catch (error) {
-      setIsLoading(false); // Hide the loading indicator
+      setIsLoading(false); 
       Alert.alert("Erro ao atualizar os dados: ", error.message);
       backToFirstScreen();
     }

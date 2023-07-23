@@ -17,7 +17,7 @@ const VehicleScreen = () => {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      getVehiclesByUserID(); // Fetch the updated vehicle list
+      getVehiclesByUserID();
     });
   
     return unsubscribe;
@@ -60,7 +60,7 @@ const VehicleScreen = () => {
         vehicles.push(vehicleData);
       });
 
-      setData(vehicles); // Update the data array with the fetched vehicles
+      setData(vehicles); 
     } catch (error) {
       console.error('Erro ao obter os veículos: ', error);
     }
@@ -81,7 +81,7 @@ const VehicleScreen = () => {
         .doc(vehicleId)
         .delete();
 
-      // Refresh the data after deletion
+  
       getVehiclesByUserID();
     } catch (error) {
       console.error('Erro ao eliminar veículo: ', error);

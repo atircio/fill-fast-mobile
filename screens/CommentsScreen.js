@@ -23,7 +23,7 @@ const CommentsScreen = ({ route }) => {
   const [selectedStars, setSelectedStars] = useState(0);
   const [comment, setComment] = useState("");
   const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true); // Loading state
+  const [loading, setLoading] = useState(true); 
 
   const { place_id } = route.params;
 
@@ -31,15 +31,15 @@ const CommentsScreen = ({ route }) => {
     getComments();
   }, []);
 
-  // Função de validação do campo comment
+
   const validateComment = (comment) => {
-    // Verifica se o comentário está vazio
+   
     if (!comment.trim()) {
       Alert.alert("Erro de validação", "O comentário não pode estar vazio.");
       return false;
     }
 
-    // Verifica se o comentário tem pelo menos 7 caracteres
+
     if (comment.length < 7) {
       Alert.alert(
         "Erro de validação",
@@ -48,11 +48,11 @@ const CommentsScreen = ({ route }) => {
       return false;
     }
 
-    // Verifica se o comentário não possui mais de 1 espaço entre as palavras
+
     const words = comment.split(" ");
     for (let i = 0; i < words.length; i++) {
       if (words[i].trim().length === 0) {
-        // Ignora espaços em branco extras entre palavras
+       
         continue;
       }
       if (words[i].includes("  ")) {
@@ -69,9 +69,9 @@ const CommentsScreen = ({ route }) => {
   const [data, setData] = useState([]);
 
   const saveDataToFirestore = async () => {
-    // Validação do campo comment
+
     if (!validateComment(comment)) {
-      return; // Interrompe a função de salvamento se a validação falhar
+      return;
     }
 
     try {
@@ -140,10 +140,10 @@ const CommentsScreen = ({ route }) => {
       );
 
       setData(aux);
-      setLoading(false); // Define loading como false após os dados serem buscados
+      setLoading(false); 
     } catch (error) {
       console.error("Error getting comments: ", error);
-      setLoading(false); // Define loading como false também em caso de erro
+      setLoading(false); 
     }
   };
 

@@ -124,7 +124,7 @@ const Ab = () => {
 };
 
 async function registerForPushNotificationsAsync() {
-  // ... (Código de registro de notificações - mantido igual)
+ 
 }
 
 export default Ab;

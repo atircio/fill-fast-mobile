@@ -200,8 +200,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   carMarker: {
-    width: 1, // Defina a largura desejada
-    height: 1, // Defina a altura desejada
+    width: 1, 
+    height: 1, 
   },
   buttonContainer: {
     position: 'absolute',

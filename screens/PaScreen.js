@@ -60,7 +60,7 @@ const PaScreen = ({ route }) => {
     { id: "1", name: "Serviço 1" },
     { id: "2", name: "Serviço 2" },
     { id: "3", name: "Serviço 3" },
-    // Adicione mais serviços aqui, se necessário
+    
   ];
 
   const Press = () => {
@@ -83,9 +83,7 @@ const PaScreen = ({ route }) => {
           <Image
             style={styles.paImage}
             source={
-              /*!imageError
-            ? { uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${styles.paImage.width}&photoreference=${imageReference}&key=${API_KEY}` }
-            :*/ require('../assets/imgDefaultGas.jpg')
+              require('../assets/imgDefaultGas.jpg')
             }
             onError={handleImageError}
           />
@@ -149,8 +147,8 @@ const PaScreen = ({ route }) => {
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={{ marginRight: 10, backgroundColor: COLORS.brown, flex: 0, borderRadius: 20, height: 30, paddingHorizontal: 10, paddingVertical: 5 }}
-                onPress={() => showItemDetails(item)} // Ao pressionar o item, mostrar os detalhes
-                onLongPress={() => showItemDetails(item)} // Ao pressionar o item por um longo período, mostrar os detalhes
+                onPress={() => showItemDetails(item)} 
+                onLongPress={() => showItemDetails(item)} 
               >
                 <Text style={{ color: COLORS.white }}>{item.name}</Text>
               </TouchableOpacity>

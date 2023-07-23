@@ -29,7 +29,7 @@ const CreateAccountScreen = () => {
         const userCredentials = await auth.createUserWithEmailAndPassword(email, password);
         const user = userCredentials.user;
   
-        //console.log('Registered with:', user.email+user.name);
+        
          user.sendEmailVerification();
 
         console.log('Registered with:', user.email + user.name);
@@ -45,7 +45,7 @@ const CreateAccountScreen = () => {
         await db.collection('users').doc(userID).set({
           name: nome,
           email: user.email
-          // Outras informações adicionais do usuário
+        
         });
   
         Alert.alert('Conta de usuário criada com sucesso na Fill Fast!');

@@ -34,7 +34,7 @@ const AlertsList = ({ route }) => {
     if (IdCar) {
       const unsubscribe = navigation.addListener("focus", () => {
         console.log(IdCar);
-        getAlertsByCarID(IdCar); // Fetch the updated vehicle list
+        getAlertsByCarID(IdCar); 
       });
 
       return unsubscribe;
@@ -82,7 +82,7 @@ const AlertsList = ({ route }) => {
 
       console.log(alerts);
 
-      setData(alerts); // Update the data array with the fetched vehicles
+      setData(alerts); 
     } catch (error) {
       console.error("Erro ao obter os veículos: ", error);
     }
@@ -98,7 +98,7 @@ const AlertsList = ({ route }) => {
         .collection("alerts")
         .doc(id)
         .delete();
-      // Refresh the data after deletion
+      
       getAlertsByCarID();
     } catch (error) {
       console.error("Erro ao eliminar veículo: ", error);

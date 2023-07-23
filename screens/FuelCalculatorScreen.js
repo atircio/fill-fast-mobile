@@ -9,7 +9,7 @@ import {
   TextInput,
 } from "react-native";
 import { COLORS } from "../src/theme/theme";
-import { Picker } from "@react-native-picker/picker"; // Import the Picker from the correct package
+import { Picker } from "@react-native-picker/picker"; 
 
 const FuelCalculatorScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);

@@ -38,7 +38,7 @@ const AlertsScreen = () => {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
-      getVehiclesByUserID(); // Fetch the updated vehicle list
+      getVehiclesByUserID(); 
     });
 
     return unsubscribe;
@@ -71,7 +71,7 @@ const AlertsScreen = () => {
         vehicles.push(vehicleData);
       });
 
-      setData(vehicles); // Update the data array with the fetched vehicles
+      setData(vehicles); 
     } catch (error) {
       console.error("Erro ao obter os veículos: ", error);
     }
@@ -92,7 +92,7 @@ const AlertsScreen = () => {
         .doc(vehicleId)
         .delete();
 
-      // Refresh the data after deletion
+   
       getVehiclesByUserID();
     } catch (error) {
       console.error("Erro ao eliminar veículo: ", error);
@@ -166,7 +166,7 @@ const AlertsScreen = () => {
             data={data.slice().sort((a, b) => b.createdAt - a.createdAt)}
             renderItem={renderListItem}
             keyExtractor={(item) => item.id}
-            numColumns={2} // Define 2 columns per row
+            numColumns={2} 
             contentContainerStyle={styles.listContent}
           />
         </View>
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
     marginBottom: 50,
   },
   listContent: {
-    paddingHorizontal: 16, // Add horizontal padding to align items in the center
+    paddingHorizontal: 16, 
     paddingTop: 12,
     paddingBottom: 50,
     justifyContent: "space-between",
@@ -213,14 +213,14 @@ const styles = StyleSheet.create({
   item: {
     backgroundColor: COLORS.white,
     borderRadius: 8,
-    flexDirection: "column", // Arrange the components horizontally
+    flexDirection: "column", 
     alignItems: "center",
     paddingVertical: 12,
     paddingHorizontal: 16,
     marginBottom: 12,
     elevation: 2,
     width: (width - 50) / 2,
-    marginLeft: 8, // Add a left margin to create horizontal spacing
+    marginLeft: 8,
   },
   itemImage: {
     width: 60,
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   itemDetails: {
-    flex: 1, // Take up remaining space in the row
+    flex: 1, 
     marginLeft: 16,
   },
   itemTitle: {
