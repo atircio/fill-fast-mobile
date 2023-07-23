@@ -8,6 +8,8 @@ import User from '../modules/mobileUser';
 import { CurrentUser, checkAsyncStorageData, getUser } from '../database/Database';
 import { LoginCredentialData } from '../database/LoginCredential';
 
+
+
 const SignInScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -16,42 +18,11 @@ const SignInScreen = () => {
   const navigation = useNavigation();
 
   const goToSignIn = () => {
-    navigation.navigate('SignInScreen')
-  }
+    navigation.navigate('SignInScreen');
+  };
 
   const goToCreateAccountScreen = () => {
-    navigation.navigate('Create')
-  }
-
-  
-  
-
-  const handleSignUp = async () => {
-    try {
-      const userCredentials = await auth.createUserWithEmailAndPassword(email, password);
-      const user = userCredentials.user;
-  
-      console.log('Registered with:', user.email);
-  
-      const userInstance = new CurrentUser();
-      await userInstance.insertUser(user);
-  
-      const retrievedUser = await getUser();
-      LoginCredentialData.push(await retrievedUser);
-  
-      const userID = user.uid; 
-
-      await db.collection('users').doc(userID).set({
-        email: user.email
-       
-      });
-  
-      Alert.alert('Conta de usuário criada com sucesso!');
-  
-      navigation.replace('Tab');
-    } catch (error) {
-      alert(error.message);
-    }
+    navigation.navigate('Create');
   };
 
   const handlePasswordReset = async () => {
@@ -91,14 +62,28 @@ const SignInScreen = () => {
     }
   };
   
-  
+
   const handleLogin = async () => {
+    if (!email && !password) {
+      Alert.alert('Erro', 'Por favor, digite seu email e senha.');
+      return;
+    }
+
+    if (!email) {
+      Alert.alert('Erro', 'Por favor, digite seu email.');
+      return;
+    }
+
+    if (!password) {
+      Alert.alert('Erro', 'Por favor, digite sua senha.');
+      return;
+    }
+
     try {
       setLoading(true);
       const userCredentials = await auth.signInWithEmailAndPassword(email, password);
       const user = userCredentials.user;
-  
-     
+
       if (!user.emailVerified) {
         Alert.alert(
           'Erro',
@@ -123,32 +108,30 @@ const SignInScreen = () => {
         );
         return;
       }
-  
+
       const userInstance = new CurrentUser();
       await userInstance.insertUser(user);
-  
+
       const retrievedUser = await getUser();
       LoginCredentialData.push(await retrievedUser);
-  
+
       setLoading(false);
       navigation.replace('Tab');
     } catch (error) {
       console.log(error);
-   
-   if (error.code === 'auth/user-not-found') {
-   
-    Alert.alert('Erro', 'O e-mail fornecido não está associado a uma conta. Verifique o e-mail digitado ou crie uma nova conta.');
-  } else if (error.code === 'auth/wrong-password') {
-    
-    Alert.alert('Erro', 'Senha incorreta. Verifique a senha digitada e tente novamente.');
-  } else {
-   
-    Alert.alert('Erro', error.message);
-  }
+
+      if (error.code === 'auth/user-not-found') {
+        Alert.alert('Erro', 'O e-mail fornecido não está associado a uma conta. Verifique o e-mail digitado ou crie uma nova conta.');
+      } else if (error.code === 'auth/wrong-password') {
+        Alert.alert('Erro', 'Senha incorreta. Verifique a senha digitada e tente novamente.');
+      } else {
+        Alert.alert('Erro', error.message);
+      }
+
       setLoading(false);
     }
   };
-  
+
   
   return (
     <View style={{ backgroundColor: COLORS.bg, height: '100%' }}>
