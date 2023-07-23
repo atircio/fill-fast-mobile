@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, Image, Alert, Linking } from 'react-native';
-import { AntDesign, Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import { AntDesign, Ionicons, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../src/theme/theme';
 import { CurrentUser, getUser } from '../database/Database';
 import { useNavigation } from '@react-navigation/native';
@@ -9,9 +9,12 @@ import { auth } from '../firebase';
 import { LoginCredentialData } from '../database/LoginCredential';
 import NotAuthorized from './NotAuthorized';
 import Swiper from 'react-native-swiper';
+import { db } from '../firebase'; // Import the Firestore database instance
+
 
 const AccountScreen = () => {
   const [user, setUser] = useState(null);
+  const [data, setData] = useState([]);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -23,6 +26,33 @@ const AccountScreen = () => {
 
     fetchUser();
   }, []);
+
+  useEffect(() => {
+    const userWithEmail = LoginCredentialData.find((item) => item && item.uid);
+    const currentUserID = userWithEmail ? userWithEmail.uid : null;
+    console.log("++++++++++++++++++++++" + currentUserID)
+    getUserFirebase(currentUserID)
+  }, [])
+
+  const FuelScreenCalc = () => {
+    navigation.navigate('FuelCalculatorScreen');
+  };
+
+
+  const getUserFirebase = async (id) => {
+    try {
+      const doc = await db.collection('users').doc(id).get();
+      if (doc.exists) {
+        const user = doc.data();
+        console.log(user);
+        setData(user);
+      } else {
+        console.log('User not found');
+      }
+    } catch (error) {
+      console.error('Error getting user:', error);
+    }
+  };
 
   const handleSendEmailVerification = async () => {
     try {
@@ -43,11 +73,11 @@ const AccountScreen = () => {
 
   const handleLogout = async () => {
     try {
-      await auth.signOut(); 
+      await auth.signOut();
       await AsyncStorage.removeItem('user');
       LoginCredentialData.splice(0, LoginCredentialData.length);
-      Alert.alert('Está sendo redirecionado para a tela principal') 
-      navigation.replace('WelcomeScreen'); 
+      Alert.alert('Está sendo redirecionado para a tela principal')
+      navigation.replace('WelcomeScreen');
     } catch (error) {
       console.error('Error logging out:', error);
     }
@@ -64,7 +94,7 @@ const AccountScreen = () => {
       Alert.alert('Erro ao enviar o e-mail de recuperação de senha.');
     }
   };
-  
+
   const userWithEmail = LoginCredentialData.find((item) => item && item.email);
   const result = userWithEmail || null;
 
@@ -74,7 +104,7 @@ const AccountScreen = () => {
       <View style={styles.container}>
         <View style={styles.profileContainer}>
           <Image source={require('../assets/profile-pic.png')} style={styles.profileImage} />
-          <Text style={styles.email}>{user ? user.email : 'Faça Login'}</Text>
+          <Text style={styles.email}>{data ? data.name : 'Faça Login'}</Text>
         </View>
 
         <View style={styles.separator} />
@@ -89,6 +119,12 @@ const AccountScreen = () => {
           <TouchableOpacity style={styles.option} >
             <FontAwesome5 name="cog" size={24} color="black" />
             <Text style={styles.optionText}>Definições</Text>
+          </TouchableOpacity>
+
+
+          <TouchableOpacity style={styles.option} onPress={FuelScreenCalc}>
+            <MaterialCommunityIcons name="fuel" size={24} color="black" />
+            <Text style={styles.optionText}>Calcular Combustível</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.option} onPress={handleLogout}>

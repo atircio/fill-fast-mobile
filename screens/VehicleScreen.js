@@ -15,6 +15,14 @@ const VehicleScreen = () => {
     navigation.replace('Tab');
   };
 
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      getVehiclesByUserID(); // Fetch the updated vehicle list
+    });
+  
+    return unsubscribe;
+  }, [navigation]);
+
   const userWithEmail = LoginCredentialData.find((item) => item && item.uid);
   const result = userWithEmail || null;
 

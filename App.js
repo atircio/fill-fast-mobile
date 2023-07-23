@@ -1,42 +1,43 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import MapScreen from './screens/MapScreen';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import {decode, encode} from 'base-64'
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, Text, View } from "react-native";
+import MapScreen from "./screens/MapScreen";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { decode, encode } from "base-64";
 
+import MapView from "react-native-maps";
+import SplashScreen from "./screens/SplashScreen";
+import Tab from "./screens/Tab";
+import PaScreen from "./screens/PaScreen";
+import WelcomeScreen from "./screens/WelcomeScreen";
+import SignInScreen from "./screens/SignInScreen";
+import TravelScreen from "./screens/TravelScreen";
+import VehicleBuild from "./screens/VehicleBuild";
+import NotAuthorized from "./screens/NotAuthorized";
+import { COLORS } from "./src/theme/theme";
+import AlertsBuild from "./screens/AlertsBuild";
+import AlertsList from "./screens/AlertsList";
+import Ab from "./screens/Ab";
+import CommentsScreen from "./screens/CommentsScreen";
+import Create from "./screens/Create";
+import FuelCalculatorScreen from "./screens/FuelCalculatorScreen";
 
-import MapView from 'react-native-maps';
-import SplashScreen from './screens/SplashScreen';
-import Tab from './screens/Tab';
-import PaScreen from './screens/PaScreen';
-import WelcomeScreen from './screens/WelcomeScreen';
-import SignInScreen from './screens/SignInScreen';
-import TravelScreen from './screens/TravelScreen';
-import VehicleBuild from './screens/VehicleBuild';
-import NotAuthorized from './screens/NotAuthorized';
-import { COLORS } from './src/theme/theme';
-import AlertsBuild from './screens/AlertsBuild';
-import AlertsList from './screens/AlertsList';
-import Ab from './screens/Ab';
-import CommentsScreen from './screens/CommentsScreen';
-import Create from './screens/Create';
+if (!global.btoa) {
+  global.btoa = encode;
+}
 
-
-if (!global.btoa) {  global.btoa = encode }
-
-if (!global.atob) { global.atob = decode }
+if (!global.atob) {
+  global.atob = decode;
+}
 
 export default function App() {
   const Stack = createNativeStackNavigator();
 
-
   return (
-
     <NavigationContainer>
       <SafeAreaView style={styles.container}>
-        <Stack.Navigator initialRouteName='WelcomeScreen'>
+        <Stack.Navigator initialRouteName="SplashScreen">
           <Stack.Screen
             name="SplashScreen"
             component={SplashScreen}
@@ -51,9 +52,17 @@ export default function App() {
               headerShown: false,
             }}
           />
+
           <Stack.Screen
             name="PaScreen"
             component={PaScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="FuelCalculatorScreen"
+            component={FuelCalculatorScreen}
             options={{
               headerShown: false,
             }}
@@ -135,7 +144,6 @@ export default function App() {
               headerShown: false,
             }}
           />
-          
         </Stack.Navigator>
       </SafeAreaView>
     </NavigationContainer>
@@ -146,10 +154,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.bg,
-textAlign:'center'
+    textAlign: "center",
   },
   map: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
 });

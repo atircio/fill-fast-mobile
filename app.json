@@ -3,18 +3,6 @@
     "name": "fill-fast",
     "scheme": "fill-fast",
     "slug": "fill-fast",
-    "plugins": [
-      [
-        "expo-notifications",
-        {
-          "icon": "./assets/notification-icon.png",
-          "color": "#e43",
-          "sounds": [
-            "./assets/notification-sound.wav"
-          ]
-        }
-      ]
-    ],
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -39,6 +27,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "bdde2fdf-c35d-47ca-974d-fa5d2a7a6222"
+      }
     }
   }
 }

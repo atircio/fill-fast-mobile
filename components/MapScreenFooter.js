@@ -6,8 +6,9 @@ import { COLORS } from '../src/theme/theme';
 import { LocationAccuracy, getCurrentPositionAsync, requestForegroundPermissionsAsync, watchPositionAsync } from 'expo-location';
 import MapViewDirections from 'react-native-maps-directions';
 import { useNavigation } from '@react-navigation/native';
+import {API_KEY} from '@env'
 
-const API_KEY = 'AIzaSyAt9UZDa-5DO4Kav_aRyyA1kOB83NEz0xY';
+
 
 
 const MapScreenFooter = () => {
@@ -46,6 +47,7 @@ const MapScreenFooter = () => {
         .then(response => response.json())
         .then(data => {
           const stations = data.results.map(result => {
+            const opened = result.opening_hours && result.opening_hours.open_now ? true : false;
             const imageReference = result.photos && result.photos.length > 0 ? result.photos[0].photo_reference : '';
             return {
               id: result.place_id,
@@ -56,7 +58,8 @@ const MapScreenFooter = () => {
               latitude: result.geometry.location.lat,
               longitude: result.geometry.location.lng,
               imageReference: imageReference,
-              address: result.vicinity
+              address: result.vicinity,
+              opened: opened,
             }
           });
           console.log(stations)
@@ -90,6 +93,7 @@ const MapScreenFooter = () => {
           address: item.address,
           latitude2: item.latitude,
           longitude2: item.longitude,
+          opened: item.opened
         })
     }
 

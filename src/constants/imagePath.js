@@ -1,3 +1,3 @@
 export default {
-    CurLoc: require('../../assets/carTravelScreen.png')
+    CurLoc: require('../../assets/Oval.png')
 }
