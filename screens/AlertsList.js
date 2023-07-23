@@ -31,12 +31,15 @@ const AlertsList = ({ route }) => {
   }, [route]);
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
-      getAlertsByCarID(IdCar); // Fetch the updated vehicle list
-    });
+    if (IdCar) {
+      const unsubscribe = navigation.addListener("focus", () => {
+        console.log(IdCar);
+        getAlertsByCarID(IdCar); // Fetch the updated vehicle list
+      });
 
-    return unsubscribe;
-  }, [navigation]);
+      return unsubscribe;
+    }
+  }, [navigation, IdCar]);
 
   const Press = () => {
     navigation.replace("Tab");

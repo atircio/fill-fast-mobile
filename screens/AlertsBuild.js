@@ -95,10 +95,79 @@ const AlertsBuild = ({ route }) => {
     }
   }, [route]);
 
+  const validateTitle = (title) => {
+    const titleRegex = /^[a-zA-Z]+(?: [a-zA-Z]+)*$/;
+    if (!titleRegex.test(title)) {
+      Alert.alert(
+        "Erro de validação",
+        "O título deve conter apenas letras e permitir apenas 1 espaço em branco entre as palavras."
+      );
+      return false; // Interrompe a função de salvamento
+    }
+    return true; // Continua a execução da função de salvamento
+  };
+
+  const validateNote = (note) => {
+    const noteRegex = /^[a-zA-Z0-9]+(?: [a-zA-Z0-9]+)*$/;
+    if (!noteRegex.test(note)) {
+      Alert.alert(
+        "Erro de validação",
+        "A nota deve conter apenas letras e números, e permitir apenas 1 espaço em branco entre as palavras."
+      );
+      return false; // Interrompe a função de salvamento
+    }
+    return true; // Continua a execução da função de salvamento
+  };
+
+  const validateYear = (year) => {
+    const yearRegex = /^\d{4}$/;
+    if (!yearRegex.test(year)) {
+      Alert.alert(
+        "Erro de validação",
+        "O ano deve conter apenas números e ter exatamente 4 caracteres."
+      );
+      return false; // Interrompe a função de salvamento
+    }
+    return true; // Continua a execução da função de salvamento
+  };
+
+  const validateDate = (date) => {
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(date)) {
+      Alert.alert(
+        "Erro de validação",
+        "A data deve seguir o formato (YYYY-MM-DD) e conter apenas números e o caractere '-'."
+      );
+      return false; // Interrompe a função de salvamento
+    }
+    return true; // Continua a execução da função de salvamento
+  };
+
+  const validateTime = (time) => {
+    const timeRegex = /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/;
+    if (!timeRegex.test(time)) {
+      Alert.alert(
+        "Erro de validação",
+        "O horário deve seguir o formato (HH:mm) e conter apenas números e o caractere ':'."
+      );
+      return false; // Interrompe a função de salvamento
+    }
+    return true; // Continua a execução da função de salvamento
+  };
+
   const saveDataToFirestore = async () => {
     try {
+      if (!title) {
+        Alert.alert("Erro de validação", "O campo título é obrigatório.");
+        return;
+      }
+
+      if (!note) {
+        Alert.alert("Erro de validação", "O campo nota é obrigatório.");
+        return;
+      }
       if (!startDate || !startTime) {
-        alert("Por Favor, coloque uma data válida");
+        alert("Por Favor, coloque a data e o horário");
         return;
       }
       const dateTime = new Date(`${startDate}T${startTime}`);
@@ -109,6 +178,15 @@ const AlertsBuild = ({ route }) => {
           "Por favor, selecione uma data e horário futuros para a notificação."
         );
         return;
+      }
+
+      if (
+        !validateTitle(title) ||
+        !validateNote(note) ||
+        !validateDate(startDate) ||
+        !validateTime(startTime)
+      ) {
+        return; // Interrompe a função de salvamento se alguma validação falhar
       }
 
       await Notifications.scheduleNotificationAsync({

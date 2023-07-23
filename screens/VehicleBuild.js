@@ -128,6 +128,65 @@ const VehicleBuild = ({ route }) => {
     try {
       setIsLoading(true); // Show the loading indicator
 
+      // Verifica se o campo "name" contém apenas letras e, no máximo, um espaço em branco consecutivo
+      const nameRegex = /^[a-zA-Z]+(\s[a-zA-Z]+)*$/;
+      if (!nameRegex.test(name)) {
+        Alert.alert(
+          "Erro de validação",
+          "O nome não pode conter caracteres especiais ou mais de um espaço em branco consecutivo."
+        );
+        return;
+      }
+
+      // Verifica se o campo "description" contém apenas letras e, no máximo, um espaço em branco consecutivo
+      const descriptionRegex = /^[a-zA-Z]+(\s[a-zA-Z]+)*$/;
+      if (description && !descriptionRegex.test(description)) {
+        Alert.alert(
+          "Erro de validação",
+          "A descrição não pode conter caracteres especiais ou mais de um espaço em branco consecutivo."
+        );
+        return;
+      }
+
+      // Verifica se o campo "brand" contém apenas letras e, no máximo, um espaço em branco consecutivo
+      const brandRegex = /^[a-zA-Z]+(\s[a-zA-Z]+)*$/;
+      if (brand && !brandRegex.test(brand)) {
+        Alert.alert(
+          "Erro de validação",
+          "A marca não pode conter caracteres especiais ou mais de um espaço em branco consecutivo."
+        );
+        return;
+      }
+
+      // Verifica se o campo "model" contém apenas letras e, no máximo, um espaço em branco consecutivo
+      const modelRegex = /^[a-zA-Z]+(\s[a-zA-Z]+)*$/;
+      if (model && !modelRegex.test(model)) {
+        Alert.alert(
+          "Erro de validação",
+          "O modelo não pode conter caracteres especiais ou mais de um espaço em branco consecutivo."
+        );
+        return;
+      }
+
+      const yearRegex = /^\d{4}$/;
+      if (year && !yearRegex.test(year)) {
+        Alert.alert(
+          "Erro de validação",
+          "O ano deve conter apenas números e ter exatamente 4 caracteres."
+        );
+        return;
+      }
+
+      // Verifica se o campo "licensePlate" contém apenas letras maiúsculas, números e o caractere "-"
+      const licensePlateRegex = /^[A-Z0-9-]+$/;
+      if (licensePlate && !licensePlateRegex.test(licensePlate)) {
+        Alert.alert(
+          "Erro de validação",
+          "A placa deve conter apenas letras maiúsculas, números e o caractere '-'."
+        );
+        return;
+      }
+
       // Autenticar o usuário atual
       const userWithEmail = LoginCredentialData.find(
         (item) => item && item.email
@@ -337,6 +396,7 @@ const VehicleBuild = ({ route }) => {
             placeholder="Ano"
             onChangeText={setYear}
             value={year}
+            keyboardType="number-pad"
           />
           <TextInput
             style={styles.input}
@@ -365,7 +425,7 @@ const VehicleBuild = ({ route }) => {
           {imageUri ? (
             <Image source={{ uri: imageUri }} style={styles.image} />
           ) : (
-            <Text style={styles.placeholderText}>Adicione fswfeuma imagem</Text>
+            <Text style={styles.placeholderText}>Adicione uma imagem</Text>
           )}
           <TouchableOpacity
             style={styles.imageButton}
