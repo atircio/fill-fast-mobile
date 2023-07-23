@@ -1,42 +1,47 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput, Alert, ScrollView, ActivityIndicator } from 'react-native';
-import { AntDesign } from '@expo/vector-icons';
-import { COLORS } from '../src/theme/theme';
-import { Picker } from '@react-native-picker/picker';
-import * as ImagePicker from 'expo-image-picker';
-import { useNavigation } from '@react-navigation/native';
-import { db, auth, storage, firebase } from '../firebase';
-import { LoginCredentialData } from '../database/LoginCredential';
-import carDefault from '../assets/carDefault.png'
+import React, { useEffect, useState, useRef } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  TextInput,
+  Alert,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
+import { AntDesign } from "@expo/vector-icons";
+import { COLORS } from "../src/theme/theme";
+import { Picker } from "@react-native-picker/picker";
+import * as ImagePicker from "expo-image-picker";
+import { useNavigation } from "@react-navigation/native";
+import { db, auth, storage, firebase } from "../firebase";
+import { LoginCredentialData } from "../database/LoginCredential";
+import carDefault from "../assets/carDefault.png";
 
 const VehicleBuild = ({ route }) => {
   const navigation = useNavigation();
   const [imageUri, setImageUri] = useState(null);
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [fuelType, setFuelType] = useState('');
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [fuelType, setFuelType] = useState("");
   const [hybrid, setHybrid] = useState(false);
-  const [brand, setBrand] = useState('');
-  const [model, setModel] = useState('');
-  const [year, setYear] = useState('');
-  const [licensePlate, setLicensePlate] = useState('');
+  const [brand, setBrand] = useState("");
+  const [model, setModel] = useState("");
+  const [year, setYear] = useState("");
+  const [licensePlate, setLicensePlate] = useState("");
 
   const [data, setData] = useState([]); // Initialize data with an empty array
   const [isLoading, setIsLoading] = useState(true); // Adiciona a variável isLoading
 
   const [IdCar, setIdCar] = useState(null);
 
-
-
-
   const backScreen = () => {
     navigation.goBack();
   };
   const backToFirstScreen = () => {
-    navigation.navigate('Veiculo', { screen: 'VehicleBuild' });
+    navigation.navigate("Veiculo", { screen: "VehicleBuild" });
   };
-
-  
 
   useEffect(() => {
     if (route.params) {
@@ -45,33 +50,35 @@ const VehicleBuild = ({ route }) => {
       getVehiclesByUserID(carID);
     }
   }, [route]);
-  
+
   const getVehiclesByUserID = async (carID) => {
     try {
-      const userWithEmail = LoginCredentialData.find((item) => item && item.email);
+      const userWithEmail = LoginCredentialData.find(
+        (item) => item && item.email
+      );
       const currentUserID = userWithEmail ? userWithEmail.uid : null;
-  
+
       if (!currentUserID) {
-        console.error('Erro: Usuário não autenticado');
+        console.error("Erro: Usuário não autenticado");
         return;
       }
-  
+
       const querySnapshot = await db
-        .collection('users')
+        .collection("users")
         .doc(currentUserID)
-        .collection('veiculos')
-        .where('id', '==', carID)
+        .collection("veiculos")
+        .where("id", "==", carID)
         .get();
-  
+
       let vehicleData = {};
       querySnapshot.forEach((doc) => {
         vehicleData = doc.data();
       });
-  
+
       setData(vehicleData);
       setIsLoading(false);
       console.log(vehicleData);
-  
+
       // Preencher Inputs com os dados do objeto data
       setName(vehicleData.name);
       setDescription(vehicleData.description);
@@ -82,18 +89,18 @@ const VehicleBuild = ({ route }) => {
       setYear(vehicleData.year);
       setLicensePlate(vehicleData.licensePlate);
       setImageUri(vehicleData.imageURL);
-  
     } catch (error) {
       setIsLoading(false);
-      console.error('Erro ao obter os veículos:', error);
+      console.error("Erro ao obter os veículos:", error);
     }
   };
 
   const handleImagePicker = async () => {
     try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        console.log('Permission denied');
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        console.log("Permission denied");
         return;
       }
 
@@ -108,31 +115,33 @@ const VehicleBuild = ({ route }) => {
         setImageUri(result.uri);
       }
     } catch (error) {
-      console.log('Error selecting image:', error);
+      console.log("Error selecting image:", error);
     }
   };
 
   const saveDataToFirestore = async () => {
-    if (name === '') {
-      Alert.alert('O nome é um campo obrigatório');
+    if (name === "") {
+      Alert.alert("O nome é um campo obrigatório");
       return;
     }
-  
+
     try {
       setIsLoading(true); // Show the loading indicator
-  
+
       // Autenticar o usuário atual
-      const userWithEmail = LoginCredentialData.find((item) => item && item.email);
+      const userWithEmail = LoginCredentialData.find(
+        (item) => item && item.email
+      );
       const currentUserID = userWithEmail ? userWithEmail.uid : null;
-  
+
       if (!currentUserID) {
         setIsLoading(false); // Hide the loading indicator
-        Alert.alert('Erro: Usuário não autenticado');
+        Alert.alert("Erro: Usuário não autenticado");
         return;
       }
-  
-      let imageURL = '';
-  
+
+      let imageURL = "";
+
       if (imageUri) {
         // Salvar a imagem no Firebase Storage
         const imageFileName = `${currentUserID}_${name}.jpg`; // Nome do arquivo com base no ID do usuário e no nome do veículo
@@ -140,20 +149,20 @@ const VehicleBuild = ({ route }) => {
         const blob = await response.blob();
         const storageRef = storage.ref().child(imageFileName);
         await storageRef.put(blob);
-  
+
         // Obter a URL da imagem salva no Firebase Storage
         imageURL = await storageRef.getDownloadURL();
       }
-  
+
       const currentUTC = firebase.firestore.Timestamp.now();
-  
+
       // Criar um ID único para o veículo
       const vehicleDocRef = db
-        .collection('users')
+        .collection("users")
         .doc(currentUserID)
-        .collection('veiculos')
+        .collection("veiculos")
         .doc();
-  
+
       // Salvar informações do veículo no documento do usuário
       await vehicleDocRef.set({
         id: vehicleDocRef.id, // Salvar o ID único do veículo
@@ -166,42 +175,43 @@ const VehicleBuild = ({ route }) => {
         year,
         licensePlate,
         imageURL,
-        createdAt: currentUTC
+        createdAt: currentUTC,
       });
-  
+
       setIsLoading(false); // Hide the loading indicator
-      Alert.alert('Dados salvos com sucesso!');
+      Alert.alert("Dados salvos com sucesso!");
       backToFirstScreen();
     } catch (error) {
       setIsLoading(false); // Hide the loading indicator
-      Alert.alert('Erro ao salvar os dados: ', error.message);
+      Alert.alert("Erro ao salvar os dados: ", error.message);
       backToFirstScreen();
-
     }
   };
 
   const updateDataInFirestore = async () => {
     try {
       setIsLoading(true); // Show the loading indicator
-  
+
       // Autenticar o usuário atual
-      const userWithEmail = LoginCredentialData.find((item) => item && item.email);
+      const userWithEmail = LoginCredentialData.find(
+        (item) => item && item.email
+      );
       const currentUserID = userWithEmail ? userWithEmail.uid : null;
-  
+
       if (!currentUserID) {
         setIsLoading(false); // Hide the loading indicator
-        Alert.alert('Erro: Usuário não autenticado');
+        Alert.alert("Erro: Usuário não autenticado");
         return;
       }
-  
+
       const vehicleDocRef = db
-        .collection('users')
+        .collection("users")
         .doc(currentUserID)
-        .collection('veiculos')
+        .collection("veiculos")
         .doc(IdCar);
 
-        let imageURL = '';
-  
+      let imageURL = "";
+
       if (imageUri) {
         // Salvar a imagem no Firebase Storage
         const imageFileName = `${currentUserID}_${name}.jpg`; // Nome do arquivo com base no ID do usuário e no nome do veículo
@@ -209,51 +219,49 @@ const VehicleBuild = ({ route }) => {
         const blob = await response.blob();
         const storageRef = storage.ref().child(imageFileName);
         await storageRef.put(blob);
-  
+
         // Obter a URL da imagem salva no Firebase Storage
         imageURL = await storageRef.getDownloadURL();
       }
 
-        const currentUTC = firebase.firestore.Timestamp.now();
+      const currentUTC = firebase.firestore.Timestamp.now();
 
+      data.brand = brand;
+      data.createdAt = currentUTC;
+      data.description = description;
+      data.fuelType = fuelType;
+      data.hybrid = hybrid;
+      data.imageURL = imageURL;
+      data.licensePlate = licensePlate;
+      data.model = model;
+      data.name = name;
+      data.year = year;
 
-
-        data.brand = brand;
-        data.createdAt = currentUTC;
-        data.description = description;
-        data.fuelType = fuelType;
-        data.hybrid = hybrid;
-        data.imageURL = imageURL;
-        data.licensePlate = licensePlate;
-        data.model = model;
-        data.name = name;
-        data.year = year;
-
-  
       await vehicleDocRef.update(data);
-  
+
       setIsLoading(false); // Hide the loading indicator
-      Alert.alert('Dados atualizados com sucesso!');
-      backToFirstScreen()
+      Alert.alert("Dados atualizados com sucesso!");
+      backToFirstScreen();
     } catch (error) {
       setIsLoading(false); // Hide the loading indicator
-      Alert.alert('Erro ao atualizar os dados: ', error.message);
-      backToFirstScreen()
-
+      Alert.alert("Erro ao atualizar os dados: ", error.message);
+      backToFirstScreen();
     }
   };
-  
+
   const setNameValid = (value) => {
-    console.log("gh.")
-    if ((/^[a-zA-Z\s]*$/.match(value))) {
+    console.log("gh.");
+    if (/^[a-zA-Z\s]*$/.match(value)) {
       setName(value);
     } else {
-      Alert.alert('Erro de validação', 'Não é possível inserir caracteres especiais no nome.');
+      Alert.alert(
+        "Erro de validação",
+        "Não é possível inserir caracteres especiais no nome."
+      );
     }
   };
-  
-  if (route.params) {
 
+  if (route.params) {
     if (isLoading) {
       return (
         <View style={styles.loadingContainer}>
@@ -269,7 +277,10 @@ const VehicleBuild = ({ route }) => {
           ) : (
             <Text style={styles.placeholderText}>Adicione uma imagem</Text>
           )}
-          <TouchableOpacity style={styles.imageButton} onPress={handleImagePicker}>
+          <TouchableOpacity
+            style={styles.imageButton}
+            onPress={handleImagePicker}
+          >
             <AntDesign name="picture" size={24} color="white" />
           </TouchableOpacity>
         </View>
@@ -305,7 +316,9 @@ const VehicleBuild = ({ route }) => {
             ) : (
               <AntDesign name="checksquareo" size={24} color="black" />
             )}
-            <Text style={styles.checkboxLabel}>Veículo Híbrido (2 tanques)</Text>
+            <Text style={styles.checkboxLabel}>
+              Veículo Híbrido (2 tanques)
+            </Text>
           </TouchableOpacity>
           <TextInput
             style={styles.input}
@@ -333,7 +346,10 @@ const VehicleBuild = ({ route }) => {
           />
         </View>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.saveButton} onPress={updateDataInFirestore}>
+          <TouchableOpacity
+            style={styles.saveButton}
+            onPress={updateDataInFirestore}
+          >
             <Text style={styles.saveButtonText}>Salvar</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.cancelButton} onPress={backScreen}>
@@ -351,7 +367,10 @@ const VehicleBuild = ({ route }) => {
           ) : (
             <Text style={styles.placeholderText}>Adicione fswfeuma imagem</Text>
           )}
-          <TouchableOpacity style={styles.imageButton} onPress={handleImagePicker}>
+          <TouchableOpacity
+            style={styles.imageButton}
+            onPress={handleImagePicker}
+          >
             <AntDesign name="picture" size={24} color="white" />
           </TouchableOpacity>
         </View>
@@ -387,7 +406,9 @@ const VehicleBuild = ({ route }) => {
             ) : (
               <AntDesign name="checksquareo" size={24} color="black" />
             )}
-            <Text style={styles.checkboxLabel}>Veículo Híbrido (2 tanques)</Text>
+            <Text style={styles.checkboxLabel}>
+              Veículo Híbrido (2 tanques)
+            </Text>
           </TouchableOpacity>
           <TextInput
             style={styles.input}
@@ -415,7 +436,10 @@ const VehicleBuild = ({ route }) => {
           />
         </View>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.saveButton} onPress={saveDataToFirestore}>
+          <TouchableOpacity
+            style={styles.saveButton}
+            onPress={saveDataToFirestore}
+          >
             <Text style={styles.saveButtonText}>Salvar</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.cancelButton} onPress={backScreen}>
@@ -425,29 +449,28 @@ const VehicleBuild = ({ route }) => {
       </ScrollView>
     );
   }
-
 };
 
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: COLORS.bg,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   card: {
-    width: '90%',
+    width: "90%",
     height: 150,
     backgroundColor: COLORS.primary,
     borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 20,
   },
   image: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
     borderRadius: 8,
   },
   placeholderText: {
@@ -455,18 +478,18 @@ const styles = StyleSheet.create({
     color: COLORS.white,
   },
   imageButton: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 16,
     right: 16,
     backgroundColor: COLORS.primary,
     borderRadius: 30,
     width: 60,
     height: 60,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   cardItem: {
-    width: '90%',
+    width: "90%",
     backgroundColor: COLORS.white,
     padding: 10,
     borderRadius: 8,
@@ -482,53 +505,53 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 8,
   },
   checkboxButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   checkboxLabel: {
     marginLeft: 8,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     marginHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 100,
   },
   saveButton: {
-    backgroundColor: '#EAB963',
+    backgroundColor: "#EAB963",
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 8,
     width: 100,
-    alignItems: 'center',
+    alignItems: "center",
   },
   saveButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
   },
   cancelButton: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: '#EAB963',
+    borderColor: "#EAB963",
     width: 100,
-    alignItems: 'center',
+    alignItems: "center",
   },
   cancelButtonText: {
-    color: '#EAB963',
-    fontWeight: 'bold',
+    color: "#EAB963",
+    fontWeight: "bold",
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

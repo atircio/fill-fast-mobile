@@ -1,29 +1,43 @@
-import React, { useEffect, useState } from 'react';
-import * as Notifications from 'expo-notifications';
-import moment from 'moment';
-
-import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput, Alert, ScrollView, ActivityIndicator } from 'react-native';
-import { AntDesign, MaterialIcons } from '@expo/vector-icons';
-import { COLORS } from '../src/theme/theme';
-import { Picker } from '@react-native-picker/picker';
-import { RadioButton } from 'react-native-paper';
-import * as ImagePicker from 'expo-image-picker';
-import { useNavigation } from '@react-navigation/native';
-import { db, auth, storage, firebase } from '../firebase';
-import { LoginCredentialData } from '../database/LoginCredential';
-import carDefault from '../assets/carDefault.png';
+import React, { useEffect, useState, useRef } from "react";
+import * as Notifications from "expo-notifications";
+import moment from "moment";
+import {
+  TextInput,
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  Alert,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
+import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { COLORS } from "../src/theme/theme";
+import { Picker } from "@react-native-picker/picker";
+import { RadioButton } from "react-native-paper";
+import * as ImagePicker from "expo-image-picker";
+import { useNavigation } from "@react-navigation/native";
+import { db, auth, storage, firebase } from "../firebase";
+import { LoginCredentialData } from "../database/LoginCredential";
+import carDefault from "../assets/carDefault.png";
 
 const AlertsBuild = ({ route }) => {
-  const [service, setService] = useState('');
-  const [title, setTitle] = useState('');
-  const [note, setNote] = useState('');
-  const [repetition, setRepetition] = useState('unico');
-  const [startDate, setStartDate] = useState('');
-  const [startTime, setStartTime] = useState('');
-  const [repeatOption, setRepeatOption] = useState('');
+  const [service, setService] = useState("");
+  const [title, setTitle] = useState("");
+  const [note, setNote] = useState("");
+  const [repetition, setRepetition] = useState("unico");
+  const [startDate, setStartDate] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [repeatOption, setRepeatOption] = useState("");
+
+  const [expoPushToken, setExpoPushToken] = useState("");
+  const [notification, setNotification] = useState(false);
+  const [notificationTime, setNotificationTime] = useState("");
+  const notificationListener = useRef();
+  const responseListener = useRef();
 
   const [data, setData] = useState([]); // Initialize data with an empty array
-  const [isLoading, setIsLoading] = useState(true); // Adiciona a variável isLoading
 
   const [IdCar, setIdCar] = useState(null);
 
@@ -33,10 +47,34 @@ const AlertsBuild = ({ route }) => {
     navigation.goBack();
   };
 
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    }),
+  });
+
   useEffect(() => {
-    const subscription = Notifications.addNotificationReceivedListener(handleNotification);
+    registerForPushNotificationsAsync().then((token) =>
+      setExpoPushToken(token)
+    );
+
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener((notification) => {
+        setNotification(notification);
+      });
+
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log(response);
+      });
+
     return () => {
-      subscription.remove();
+      Notifications.removeNotificationSubscription(
+        notificationListener.current
+      );
+      Notifications.removeNotificationSubscription(responseListener.current);
     };
   }, []);
 
@@ -44,74 +82,52 @@ const AlertsBuild = ({ route }) => {
     // Aqui você pode tratar a notificação recebida, se necessário
     console.log(notification);
   };
-  
 
+  async function registerForPushNotificationsAsync() {
+    // ... (Código de registro de notificações - mantido igual)
+  }
 
   useEffect(() => {
     if (route.params) {
       const { carID } = route.params;
       setIdCar(carID);
-      console.log(carID)
+      console.log(carID);
     }
-
   }, [route]);
-
-
-
-  const fetchData = () => {
-    // Code to fetch data from Firestore
-    // Example:
-    db.collection('alerts')
-      .get()
-      .then((querySnapshot) => {
-        const documents = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setData(documents);
-        setIsLoading(false); // Set isLoading to false when data fetching is complete
-      })
-      .catch((error) => {
-        console.log('Error getting documents: ', error);
-        setIsLoading(false); // Set isLoading to false even if there's an error
-      });
-  };
-
-  const updateDataInFirestore = () => {
-    // Code to update data in Firestore
-    // Example:
-    db.collection('alerts')
-      .doc('exampleId')
-      .update({
-        service,
-        title,
-        note,
-        repetition,
-        startDate,
-        startTime,
-        repeatOption,
-      })
-      .then(() => {
-        console.log('Document successfully updated!');
-        fetchData(); // Fetch updated data after successful update
-        navigation.goBack();
-      })
-      .catch((error) => {
-        console.error('Error updating document: ', error);
-      });
-  };
 
   const saveDataToFirestore = async () => {
     try {
-      setIsLoading(true); // Show the loading indicator
+      if (!startDate || !startTime) {
+        alert("Por Favor, coloque uma data válida");
+        return;
+      }
+      const dateTime = new Date(`${startDate}T${startTime}`);
+      const now = new Date();
+
+      if (dateTime <= now) {
+        alert(
+          "Por favor, selecione uma data e horário futuros para a notificação."
+        );
+        return;
+      }
+
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: title,
+          body: note,
+          data: { data: "goes here" },
+        },
+        trigger: { date: dateTime },
+      });
 
       // Autenticar o usuário atual
-      const userWithEmail = LoginCredentialData.find((item) => item && item.email);
+      const userWithEmail = LoginCredentialData.find(
+        (item) => item && item.email
+      );
       const currentUserID = userWithEmail ? userWithEmail.uid : null;
 
       if (!currentUserID) {
-        setIsLoading(false); // Hide the loading indicator
-        Alert.alert('Erro: Usuário não autenticado');
+        Alert.alert("Erro: Usuário não autenticado");
         return;
       }
 
@@ -119,11 +135,11 @@ const AlertsBuild = ({ route }) => {
 
       // Criar um ID único para o lembrete
       const alertRef = db
-        .collection('users')
+        .collection("users")
         .doc(currentUserID)
-        .collection('veiculos')
+        .collection("veiculos")
         .doc(IdCar)
-        .collection('alerts')
+        .collection("alerts")
         .doc();
 
       // Salvar informações do lembrete no documento do usuário
@@ -140,81 +156,56 @@ const AlertsBuild = ({ route }) => {
       });
 
       // Criar a notificação com base no lembrete
-      if (repetition === 'unico' && startDate && startTime) {
+      if (repetition === "unico" && startDate && startTime) {
         const fireDateTime = moment(`${startDate}T${startTime}`).toDate();
-        console.log("fireDateTime: "+fireDateTime)
+        console.log("fireDateTime: " + fireDateTime);
 
-        console.log("data: "+startDate)
-        console.log("tempo: "+startTime)
+        console.log("data: " + startDate);
+        console.log("tempo: " + startTime);
 
         const trigger = fireDateTime.getTime() - Date.now();
-        console.log("trigger: "+trigger)
+        console.log("trigger: " + trigger);
 
         if (trigger > 0) {
-          console.log("hbjkbjnhkhjkbj")
+          console.log("hbjkbjnhkhjkbj");
           // Agendar a notificação para o tempo especificado
           await Notifications.scheduleNotificationAsync({
             content: {
-              title: 'Lembrete',
-              body: title,
-              data: { lembreteId: alertRef.id },
+              title: title,
+              body: note,
+              data: { data: "goes here" },
             },
-            trigger: { seconds: Math.floor(trigger / 1000) },
+            trigger: { date: dateTime },
           });
         }
-      } else if (repetition === 'repetir' && startDate && startTime && repeatOption) {
-        const repeatOptions = {
-          diariamente: { repeats: true, every: 86400 },
-          semanalmente: { repeats: true, every: 604800 },
-          mensalmente: { repeats: true, every: 2592000 },
-        };
-
-        const fireDateTime = new Date(`${startDate} ${startTime}`);
-
-        // Agendar a notificação para o tempo especificado, com base na opção de repetição selecionada
-        await Notifications.scheduleNotificationAsync({
-          content: {
-            title: 'Lembrete',
-            body: title,
-            data: { lembreteId: alertRef.id },
-          },
-          trigger: {
-            seconds: Math.floor((fireDateTime.getTime() - Date.now()) / 1000),
-            repeats: repeatOptions[repeatOption].repeats,
-            every: repeatOptions[repeatOption].every,
-          },
-        }).then((notificationId) => {
-          console.log('Notificação agendada com sucesso. ID da notificação:', notificationId);
-        })
-        .catch((error) => {
-          console.log('Erro ao agendar notificação:', error);
-        });;
       }
-      console.log("dgbdfghfhf")
-      setIsLoading(false); // Hide the loading indicator
-      Alert.alert('Lembrete salvo com sucesso');
+
+      console.log("dgbdfghfhf");
+      Alert.alert("Lembrete salvo com sucesso");
     } catch (error) {
-      setIsLoading(false); // Hide the loading indicator
-      Alert.alert('Erro ao salvar o lembrete', error.message);
+      Alert.alert("Erro ao salvar o lembrete", error.message);
     }
   };
 
-
-
   if (route.params) {
-    if (!isLoading) {
+    /* if (!isLoading) {
       return (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
       );
-    }
+    }*/
 
     return (
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.inputContainer}>
           <Text> </Text>
-          <AntDesign name="bars" size={24} color={COLORS.primary} style={styles.icon} />
+          <AntDesign
+            name="bars"
+            size={24}
+            color={COLORS.primary}
+            style={styles.icon}
+          />
           <Picker
             style={styles.input}
             selectedValue={service}
@@ -233,7 +224,12 @@ const AlertsBuild = ({ route }) => {
           </Picker>
         </View>
         <View style={styles.inputContainer}>
-          <AntDesign name="filetext1" size={24} color={COLORS.primary} style={styles.icon} />
+          <AntDesign
+            name="filetext1"
+            size={24}
+            color={COLORS.primary}
+            style={styles.icon}
+          />
           <TextInput
             style={styles.input}
             placeholder="Título do serviço"
@@ -242,7 +238,12 @@ const AlertsBuild = ({ route }) => {
           />
         </View>
         <View style={styles.inputContainer}>
-          <AntDesign name="filetext1" size={24} color={COLORS.primary} style={styles.icon} />
+          <AntDesign
+            name="filetext1"
+            size={24}
+            color={COLORS.primary}
+            style={styles.icon}
+          />
           <TextInput
             style={styles.input}
             placeholder="Nota adicional"
@@ -255,8 +256,8 @@ const AlertsBuild = ({ route }) => {
           <View style={styles.radioButtonContainer}>
             <RadioButton
               value="unico"
-              status={repetition === 'unico' ? 'checked' : 'unchecked'}
-              onPress={() => setRepetition('unico')}
+              status={repetition === "unico" ? "checked" : "unchecked"}
+              onPress={() => setRepetition("unico")}
               color={COLORS.primary}
             />
             <Text style={styles.radioButtonLabel}>Único</Text>
@@ -264,27 +265,38 @@ const AlertsBuild = ({ route }) => {
           <View style={styles.radioButtonContainer}>
             <RadioButton
               value="repetir"
-              status={repetition === 'repetir' ? 'checked' : 'unchecked'}
-              onPress={() => setRepetition('repetir')}
+              status={repetition === "repetir" ? "checked" : "unchecked"}
+              onPress={() => setRepetition("repetir")}
               color={COLORS.primary}
             />
             <Text style={styles.radioButtonLabel}>Repetir a cada</Text>
           </View>
         </View>
 
-        {repetition === 'unico' && (
+        {repetition === "unico" && (
           <View>
             <View style={styles.inputContainer}>
-              <AntDesign name="calendar" size={24} color={COLORS.primary} style={styles.icon} />
+              <AntDesign
+                name="calendar"
+                size={24}
+                color={COLORS.primary}
+                style={styles.icon}
+              />
               <TextInput
                 style={styles.input}
-                placeholder="Data (DD/MM/AAAA)"
+                placeholder="Data (AAAA-MM--DD)"
                 value={startDate}
                 onChangeText={(text) => setStartDate(text)}
+                keyboardType="numbers-and-punctuation"
               />
             </View>
             <View style={styles.inputContainer}>
-              <AntDesign name="clockcircleo" size={24} color={COLORS.primary} style={styles.icon} />
+              <AntDesign
+                name="clockcircleo"
+                size={24}
+                color={COLORS.primary}
+                style={styles.icon}
+              />
               <TextInput
                 style={styles.input}
                 placeholder="Hora (HH:MM)"
@@ -295,10 +307,15 @@ const AlertsBuild = ({ route }) => {
           </View>
         )}
 
-        {repetition === 'repetir' && (
+        {repetition === "repetir" && (
           <View>
             <View style={styles.inputContainer}>
-              <AntDesign name="calendar" size={24} color={COLORS.primary} style={styles.icon} />
+              <AntDesign
+                name="calendar"
+                size={24}
+                color={COLORS.primary}
+                style={styles.icon}
+              />
               <TextInput
                 style={styles.input}
                 placeholder="Data de início (DD/MM/AAAA)"
@@ -307,7 +324,12 @@ const AlertsBuild = ({ route }) => {
               />
             </View>
             <View style={styles.inputContainer}>
-              <AntDesign name="clockcircleo" size={24} color={COLORS.primary} style={styles.icon} />
+              <AntDesign
+                name="clockcircleo"
+                size={24}
+                color={COLORS.primary}
+                style={styles.icon}
+              />
               <TextInput
                 style={styles.input}
                 placeholder="Hora de início (HH:MM)"
@@ -320,8 +342,10 @@ const AlertsBuild = ({ route }) => {
               <View style={styles.radioButtonContainer}>
                 <RadioButton
                   value="diariamente"
-                  status={repeatOption === 'diariamente' ? 'checked' : 'unchecked'}
-                  onPress={() => setRepeatOption('diariamente')}
+                  status={
+                    repeatOption === "diariamente" ? "checked" : "unchecked"
+                  }
+                  onPress={() => setRepeatOption("diariamente")}
                   color={COLORS.primary}
                 />
                 <Text style={styles.radioButtonLabel}>Diariamente</Text>
@@ -329,8 +353,10 @@ const AlertsBuild = ({ route }) => {
               <View style={styles.radioButtonContainer}>
                 <RadioButton
                   value="semanalmente"
-                  status={repeatOption === 'semanalmente' ? 'checked' : 'unchecked'}
-                  onPress={() => setRepeatOption('semanalmente')}
+                  status={
+                    repeatOption === "semanalmente" ? "checked" : "unchecked"
+                  }
+                  onPress={() => setRepeatOption("semanalmente")}
                   color={COLORS.primary}
                 />
                 <Text style={styles.radioButtonLabel}>Semanalmente</Text>
@@ -338,8 +364,10 @@ const AlertsBuild = ({ route }) => {
               <View style={styles.radioButtonContainer}>
                 <RadioButton
                   value="mensalmente"
-                  status={repeatOption === 'mensalmente' ? 'checked' : 'unchecked'}
-                  onPress={() => setRepeatOption('mensalmente')}
+                  status={
+                    repeatOption === "mensalmente" ? "checked" : "unchecked"
+                  }
+                  onPress={() => setRepeatOption("mensalmente")}
                   color={COLORS.primary}
                 />
                 <Text style={styles.radioButtonLabel}>Mensalmente</Text>
@@ -349,7 +377,10 @@ const AlertsBuild = ({ route }) => {
         )}
 
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.saveButton} onPress={saveDataToFirestore}>
+          <TouchableOpacity
+            style={styles.saveButton}
+            onPress={saveDataToFirestore}
+          >
             <Text style={styles.saveButtonText}>Salvar</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.cancelButton} onPress={backScreen}>
@@ -359,20 +390,19 @@ const AlertsBuild = ({ route }) => {
       </ScrollView>
     );
   }
-
 };
 
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: COLORS.bg,
-    alignItems: 'stretch',
-    justifyContent: 'space-around',
+    alignItems: "stretch",
+    justifyContent: "space-around",
     paddingHorizontal: 20,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 1,
     borderColor: COLORS.gray,
     borderRadius: 8,
@@ -388,17 +418,17 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 16,
     marginBottom: 8,
   },
   radioContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   radioButtonContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginRight: 16,
   },
   radioButtonLabel: {
@@ -406,23 +436,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     marginHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 100,
   },
   saveButton: {
-    backgroundColor: '#EAB963',
+    backgroundColor: "#EAB963",
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 8,
     width: 100,
-    alignItems: 'center',
+    alignItems: "center",
   },
   saveButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
   },
   cancelButton: {
     backgroundColor: COLORS.gray,
@@ -430,16 +460,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     width: 100,
-    alignItems: 'center',
+    alignItems: "center",
   },
   cancelButtonText: {
     color: COLORS.gold,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

@@ -36,9 +36,6 @@ const VehicleScreen = () => {
   const goToVehicleBuildEmpty = () => {
     navigation.navigate('VehicleBuild');
   };
-  const fuelCalc = () => {
-    navigation.navigate('FuelCalculatorScreen');
-  };
 
   const [data, setData] = useState([]);
   const [imageError, setImageError] = useState(false);
@@ -135,9 +132,6 @@ const VehicleScreen = () => {
   if (result) {
     return (
       <View style={{ backgroundColor: COLORS.bg, height: '100%' }}>
-          <TouchableOpacity style={styles.floatingButton}>
-    <AntDesign name="shoppingcart" size={24} color="white" />
-  </TouchableOpacity>
         <View style={styles.container}>
           <View style={{ alignItems: 'center', marginTop: 40 }}>
             <Image source={require('../assets/CarS.gif')} style={{ width: 200, height: 200 }} />
@@ -219,6 +213,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
   },
-  
-  
 });
