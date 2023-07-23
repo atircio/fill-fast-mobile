@@ -170,7 +170,16 @@ const AlertsBuild = ({ route }) => {
         alert("Por Favor, coloque a data e o horário");
         return;
       }
+
       const dateTime = new Date(`${startDate}T${startTime}`);
+
+      if (isNaN(dateTime)) {
+        alert(
+          "Data ou horário inválidos. Por favor, verifique e tente novamente."
+        );
+        return;
+      }
+
       const now = new Date();
 
       if (dateTime <= now) {

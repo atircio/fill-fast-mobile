@@ -166,13 +166,17 @@ const CommentsScreen = ({ route }) => {
                 {item.userData.name}
               </Text>
             )}
-            <Text style={styles.commentStars}>
-              {Array(item.selectedStars)
-                .fill()
-                .map((_, index) => (
-                  <Icon key={index} name="star" style={styles.starIcon} />
-                ))}
-            </Text>
+            {item.selectedStars > 0 ? (
+              <Text style={styles.commentStars}>
+                {Array(item.selectedStars)
+                  .fill()
+                  .map((_, index) => (
+                    <Icon key={index} name="star" style={styles.starIcon} />
+                  ))}
+              </Text>
+            ) : (
+              <Text style={styles.commentStars}>Sem estrelas</Text>
+            )}
             <Text style={styles.commentText}>{item.comment}</Text>
           </View>
         </View>

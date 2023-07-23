@@ -1,39 +1,59 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, Modal, TextInput } from 'react-native';
-import { COLORS } from '../src/theme/theme';
+import React, { useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  TouchableOpacity,
+  Modal,
+  TextInput,
+} from "react-native";
+import { COLORS } from "../src/theme/theme";
+import { Picker } from "@react-native-picker/picker"; // Import the Picker from the correct package
 
 const FuelCalculatorScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [tankCapacity, setTankCapacity] = useState('');
-  const [desiredLiters, setDesiredLiters] = useState('');
-  const [desiredPrice, setDesiredPrice] = useState('');
+  const [tankCapacity, setTankCapacity] = useState("");
+  const [desiredLiters, setDesiredLiters] = useState("");
+  const [desiredPrice, setDesiredPrice] = useState("");
+  const [selectedFuel, setSelectedFuel] = useState("Gasolina");
 
-  const fuelData = [
-    { id: 1, type: 'Gasóleo', price: 160 },
-    { id: 2, type: 'Gasolina', price: 300 },
-  ];
+  const fuelData = [{ id: 1, type: "CALCULAR", price: 160 }];
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity style={styles.itemContainer} onPress={() => openModal(item)}>
+    <TouchableOpacity
+      style={styles.itemContainer}
+      onPress={() => openModal(item)}
+    >
       <Text style={styles.itemText}>{item.type}</Text>
     </TouchableOpacity>
   );
 
   const openModal = (item) => {
     setModalVisible(true);
-    setTankCapacity('');
-    setDesiredLiters('');
-    setDesiredPrice((item.price / 10).toString());
+    setTankCapacity("");
+    setDesiredLiters("");
+    setDesiredPrice(item.price.toString());
+    setSelectedFuel(item.type);
   };
 
   const calculatePrice = () => {
     const liters = parseFloat(desiredLiters);
     const price = parseFloat(desiredPrice);
+
     if (liters && price) {
-      const totalPrice = liters * price;
-      return totalPrice.toFixed(2);
+      return (liters * price).toFixed(2);
     }
-    return '';
+    return "";
+  };
+
+  const calculateLiters = () => {
+    const price = parseFloat(desiredPrice);
+    if (price > 0) {
+      const liters = price / (selectedFuel === "Gasolina" ? 300 : 160);
+      return liters.toFixed(2);
+    }
+    return "";
   };
 
   const closeModal = () => {
@@ -60,16 +80,6 @@ const FuelCalculatorScreen = () => {
             <Text style={styles.modalTitle}>Calcular Combustível</Text>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Tanque (litros):</Text>
-              <TextInput
-                style={styles.input}
-                value={tankCapacity}
-                onChangeText={setTankCapacity}
-                keyboardType="numeric"
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Litros desejados:</Text>
               <TextInput
                 style={styles.input}
@@ -89,7 +99,9 @@ const FuelCalculatorScreen = () => {
               />
             </View>
 
-            <Text style={styles.totalPriceLabel}>Preço total: {calculatePrice()}Kz</Text>
+            <Text style={styles.totalPriceLabel}>
+              Preço total: {calculatePrice()}Kz
+            </Text>
 
             <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
               <Text style={styles.closeButtonText}>Fechar</Text>
@@ -107,9 +119,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.white,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
+  fuelPicker: {
+    borderWidth: 1,
+    borderColor: COLORS.gray,
+    borderRadius: 5,
+    marginBottom: 20,
+  },
+
   itemContainer: {
     padding: 20,
     marginBottom: 20,
@@ -122,19 +141,19 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
     backgroundColor: COLORS.white,
     borderRadius: 10,
     padding: 20,
-    width: '80%',
+    width: "80%",
   },
   modalTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
   },
   inputContainer: {
@@ -153,7 +172,7 @@ const styles = StyleSheet.create({
   },
   totalPriceLabel: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 20,
   },
   closeButton: {
@@ -165,6 +184,6 @@ const styles = StyleSheet.create({
   closeButtonText: {
     color: COLORS.white,
     fontSize: 18,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });
