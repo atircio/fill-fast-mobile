@@ -45,6 +45,9 @@ const VehicleScreen = () => {
   };
 
   const getVehiclesByUserID = async () => {
+    if(!result) {
+      return
+    }
     try {
       const querySnapshot = await db
         .collection('users')

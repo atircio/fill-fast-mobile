@@ -115,12 +115,13 @@ const MapScreenFooter = () => {
             <Text style={{ color: COLORS.gold, marginLeft: 2 }}>{item.rating}</Text>
             <Text style={{ color: COLORS.dark, marginLeft: 8 }}>({item.reviews})</Text>
           </View>
-          <View style={styles.paRow}>
+          {/*  <View style={styles.paRow}>
             <Ionicons name="ios-location-outline" style={styles.paLocation} />
             <Text style={{ color: COLORS.grey, marginLeft: 2 }}>{item.distance}</Text>
             <AntDesign name="clockcircleo" size={18} style={{ marginLeft: 8, color: COLORS.grey }} />
             <Text style={{ color: COLORS.grey, marginLeft: 5 }}>{item.time}</Text>
-          </View>
+          </View>*/}
+         
           <MapViewDirections
             origin={location.coords ? location.coords : {
               latitude: 13.2413602,

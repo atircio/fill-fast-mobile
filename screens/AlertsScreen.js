@@ -56,6 +56,9 @@ const AlertsScreen = () => {
   };
 
   const getVehiclesByUserID = async () => {
+   if(!result) {
+    return
+   }
     try {
       const querySnapshot = await db
         .collection("users")
@@ -73,7 +76,7 @@ const AlertsScreen = () => {
 
       setData(vehicles); 
     } catch (error) {
-      console.error("Erro ao obter os veículos: ", error);
+      //console.error("Erro ao obter os veículos: ", error);
     }
   };
 

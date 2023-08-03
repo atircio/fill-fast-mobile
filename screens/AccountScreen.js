@@ -40,6 +40,9 @@ const AccountScreen = () => {
 
 
   const getUserFirebase = async (id) => {
+    if(!result) {
+      result
+    } 
     try {
       const doc = await db.collection('users').doc(id).get();
       if (doc.exists) {
@@ -50,7 +53,7 @@ const AccountScreen = () => {
         console.log('User not found');
       }
     } catch (error) {
-      console.error('Error getting user:', error);
+      //console.error('Error getting user:', error);
     }
   };
 
@@ -111,16 +114,6 @@ const AccountScreen = () => {
 
         {/* Options list */}
         <View style={styles.optionContainer}>
-          <TouchableOpacity style={styles.option}>
-            <AntDesign name="staro" size={24} color="black" />
-            <Text style={styles.optionText}>Postos Favoritos</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.option} >
-            <FontAwesome5 name="cog" size={24} color="black" />
-            <Text style={styles.optionText}>Definições</Text>
-          </TouchableOpacity>
-
 
           <TouchableOpacity style={styles.option} onPress={FuelScreenCalc}>
             <MaterialCommunityIcons name="fuel" size={24} color="black" />

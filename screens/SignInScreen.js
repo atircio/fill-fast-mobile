@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { COLORS } from '../src/theme/theme';
 import { useNavigation } from '@react-navigation/native';
@@ -134,6 +134,7 @@ const SignInScreen = () => {
 
   
   return (
+    <ScrollView>
     <View style={{ backgroundColor: COLORS.bg, height: '100%' }}>
       <View style={{ alignItems: 'center', marginTop: 40 }}>
         <Image source={require('../assets/ML.gif')} style={{ width: 250, height: 250 }} />
@@ -170,8 +171,10 @@ const SignInScreen = () => {
         </View>
       </View>
     </View>
+    </ScrollView>
   );
 };
+
 
 export default SignInScreen;
 
